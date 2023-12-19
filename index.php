@@ -69,13 +69,13 @@ class PasswordManager
         $data = $this->getProcessing();
         $arrayPasswords = $data['arrayPassword'];
         $passwordValue= readline("Enter password value");
-        $passwordHash = password_hash($passwordValue, PASSWORD_DEFAULT);
+        $passwordEncode = base64_encode($passwordValue);
 
         if(isset($arrayPasswords[$data['passwordName']])) {
             echo "Password with this name already exists";
             return;
         }
-        $arrayPasswords[$data['passwordName']] = $passwordHash;
+        $arrayPasswords[$data['passwordName']] = $passwordEncode;
         file_put_contents($this->passwordFile, json_encode($arrayPasswords));
     }
 
@@ -89,7 +89,12 @@ class PasswordManager
             return;
         }
 
-        echo "Password: " . $arrayPasswords[$data['passwordName']];
+        $passwordEncode = $arrayPasswords[$data['passwordName']];
+        $passwordDecode = base64_decode($passwordEncode);
+
+        var_dump('password_verify', $passwordDecode, $passwordEncode);
+
+        echo "Password: " . $passwordDecode;
     }
 
 
@@ -109,11 +114,17 @@ class PasswordManager
 
     private function deletePassword()
     {
-
+        $data = $this->getProcessing();
+        unset($data['arrayPassword'][$data['passwordName']]);
+        file_put_contents($this->passwordFile, json_encode($data['arrayPassword']));
     }
 
     private function replacePassword()
     {
+        $data = $this->getProcessing();
+        $passwordValue= readline("Enter new password value");
+        $data['arrayPassword'][$data['passwordName']] =  $passwordValue;
+        file_put_contents($this->passwordFile, json_encode($data['arrayPassword']));
     }
 }
 
