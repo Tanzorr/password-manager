@@ -2,7 +2,12 @@
 
 class PasswordManager
 {
-    private $passwordFile = 'passwords.json';
+    private $storeHandler;
+
+    public function __construct(string $storeHandlerClass, string $storeClass)
+    {
+        $this->storeHandler = new $storeHandlerClass(new $storeClass());
+    }
 
     public function run()
     {
@@ -10,7 +15,9 @@ class PasswordManager
 
         $this->showMenu();
 
-        $this->getChosenPassword();
+        while (true) {
+            $this->getChosenPassword();
+        }
     }
 
     private function showMenu()
@@ -26,102 +33,22 @@ class PasswordManager
 
     private function getChosenPassword()
     {
-        $selectedChoseFromMenu = readline("Enter your choice action: ");
-        $this->processChoice($selectedChoseFromMenu);
+        $selectedChoiceFromMenu = readline("Enter your choice action: ");
+        $this->processChoice($selectedChoiceFromMenu);
     }
 
     private function processChoice($choice)
     {
-        switch ($choice) {
-            case '1':
-                $this->getPassword();
-                break;
-            case '2':
-                $this->setPassword();
-                break;
-            case '3':
-                $this->deletePassword();
-                break;
-            case '4':
-                $this->replacePassword();
-                break;
-            case '5':
-                $this->showAllPasswords();
-                break;
-            case 'q':
-                // do nothing, the loop will exit
-                break;
-            default:
-                echo "Некорректный выбор. Попробуйте снова.\n";
-        }
-    }
-
-    private function showAllPasswords()
-    {
-        $arrayPasswords = $this->getPasswords();
-        foreach ($arrayPasswords as $key => $value) {
-            echo "Password name: " . $key. "\n";
-        }
-    }
-
-    private function setPassword()
-    {
-        $data = $this->getProcessing();
-        $arrayPasswords = $data['arrayPassword'];
-        $passwordValue= readline("Enter password value");
-        $passwordEncode = base64_encode($passwordValue);
-
-        if(isset($arrayPasswords[$data['passwordName']])) {
-            echo "Password with this name already exists";
-            return;
-        }
-        $arrayPasswords[$data['passwordName']] = $passwordEncode;
-        file_put_contents($this->passwordFile, json_encode($arrayPasswords));
-    }
-
-    private function getPassword()
-    {
-        $data = $this->getProcessing();
-
-        $arrayPasswords = $data['arrayPassword'];
-        if(!isset($arrayPasswords[$data['passwordName']])) {
-            echo "Password with this name hasn't found";
-            return;
-        }
-
-        $passwordEncode = $arrayPasswords[$data['passwordName']];
-        $passwordDecode = base64_decode($passwordEncode);
-
-        echo "Password value: " . $passwordDecode;
-    }
-
-
-    private function getProcessing(): array
-    {
-        $arrayPasswords = $this->getPasswords();
-        $passwordName= readline("Enter password name ");
-
-        return ['arrayPassword'=>$arrayPasswords, 'passwordName'=>$passwordName];
-    }
-
-    private function getPasswords(): array
-    {
-        $stringPasswords = $this->passwordFile ? file_get_contents($this->passwordFile) : [];
-        return $stringPasswords ? json_decode($stringPasswords, true) : [];
-    }
-
-    private function deletePassword()
-    {
-        $data = $this->getProcessing();
-        unset($data['arrayPassword'][$data['passwordName']]);
-        file_put_contents($this->passwordFile, json_encode($data['arrayPassword'],  JSON_PRETTY_PRINT));
-    }
-
-    private function replacePassword()
-    {
-        $data = $this->getProcessing();
-        $passwordValue= readline("Enter new password value ");
-        $data['arrayPassword'][$data['passwordName']] =  $passwordValue;
-        file_put_contents($this->passwordFile, json_encode($data['arrayPassword']));
+        match ($choice) {
+            '1' => $this->storeHandler->getPassword(),
+            '2' => $this->storeHandler->inputPassword(),
+            '3' => $this->storeHandler->deletePassword(),
+            '4' => $this->storeHandler->replacePassword(),
+            '5' => $this->storeHandler->showAllPasswords(),
+            'q' => exit(),
+            default => $this->showMenu(),
+        };
     }
 }
+
+?>
