@@ -5,16 +5,26 @@ require_once 'Store.php';
 class StoreHandler
 {
     private $store;
-    public function __construct(Store $store)
+    private $passwordEncryptor;
+
+    public function __construct($storeClass,  $passwordEncryptorClass)
     {
-        $this->store = $store;
+        $this->store = new $storeClass();
+        $this->passwordEncryptor = new $passwordEncryptorClass(ENCRYPTION_KEY); // Ensure ENCRYPTION_KEY is defined
+    }
+
+    public function inputActions(): string
+    {
+        $action = readline("Enter your choice action: ");
+        return $action;
     }
 
     public function inputPassword()
     {
         $passwordName = readline("Enter password name: ");
         $passwordValue = readline("Enter password value: ");
-        $this->store->setPassword($passwordName, $passwordValue);
+        $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
+        $this->store->setPassword($passwordName, $encryptedPassword);
     }
 
     public function showAllPasswords()
@@ -26,7 +36,12 @@ class StoreHandler
     {
         $passwordName = readline("Enter password name: ");
         $passwordValue = $this->store->getPassword($passwordName);
-        echo "Password value: " . $passwordValue;
+        if ($passwordValue !== null) {
+            $decryptedPassword = $this->passwordEncryptor->decryptPassword($passwordValue);
+            echo "Password value: " . $decryptedPassword . "\n";
+        } else {
+            echo "Password not found.\n";
+        }
     }
 
     public function deletePassword()

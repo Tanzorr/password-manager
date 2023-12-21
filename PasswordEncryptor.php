@@ -20,7 +20,30 @@ class PasswordEncryptor
 
     public function decryptPassword($encryptedPassword)
     {
-        list($encryptedPassword, $iv) = explode('::', base64_decode($encryptedPassword), 2);
-        return openssl_decrypt($encryptedPassword, 'aes-256-cbc', $this->ecryptionKey, 0, $iv);
+        $decoded = base64_decode($encryptedPassword);
+
+        if ($decoded === false) {
+            // Handle base64 decoding error
+            return false;
+        }
+
+        list($encryptedPassword, $iv) = explode('::', $decoded, 2);
+
+        if ($iv === false || $encryptedPassword === false) {
+            // Handle incorrect format error
+            return false;
+        }
+
+        // Pad the IV with zeros to make it 16 bytes long
+        $paddedIV = str_pad($iv, 16, "\0");
+
+        $password = openssl_decrypt($encryptedPassword, 'aes-256-cbc', $this->ecryptionKey, 0, $paddedIV);
+
+        if ($password === false) {
+            // Handle decryption failure
+            return false;
+        }
+
+        return $password;
     }
 }

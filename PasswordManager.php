@@ -6,7 +6,7 @@ class PasswordManager
 
     public function __construct(string $storeHandlerClass, string $storeClass)
     {
-        $this->storeHandler = new $storeHandlerClass(new $storeClass());
+        $this->storeHandler = new $storeHandlerClass(new $storeClass(), new PasswordEncryptor(ENCRYPTION_KEY));
     }
 
     public function run()
@@ -33,7 +33,7 @@ class PasswordManager
 
     private function getChosenPassword()
     {
-        $selectedChoiceFromMenu = readline("Enter your choice action: ");
+        $selectedChoiceFromMenu = $this->storeHandler->inputActions();
         $this->processChoice($selectedChoiceFromMenu);
     }
 
