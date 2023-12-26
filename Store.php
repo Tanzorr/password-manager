@@ -2,16 +2,17 @@
 
 class Store
 {
-    private $passwordsFile = 'passwords.json';
+    private string $passwordsFile = 'passwords.json';
 
 
-    public function getPasswords()
+    public function getPasswords(): array
     {
         $passwords = file_get_contents($this->passwordsFile);
-        return json_decode($passwords, true);
+
+        return json_decode($passwords, true) ?? [];
     }
 
-    public function setPassword($passwordName, $passwordValue)
+    public function setPassword($passwordName, $passwordValue): void
     {
         $passwords = $this->getPasswords();
         $passwords[$passwordName] = $passwordValue;
@@ -25,7 +26,7 @@ class Store
         return $passwords[$passwordName];
     }
 
-    public function deletePassword($passwordName)
+    public function deletePassword($passwordName): void
     {
         $passwords = $this->getPasswords();
         unset($passwords[$passwordName]);
@@ -33,15 +34,20 @@ class Store
         file_put_contents($this->passwordsFile, $passwords);
     }
 
-    public function showAllPasswords()
+    public function showAllPasswords(): void
     {
         $passwords = $this->getPasswords();
+        if(count($passwords) === 0) {
+            echo "No passwords found.\n";
+            return;
+        }
+
         foreach ($passwords as $key => $value) {
             echo "Password name: " . $key. "\n";
         }
     }
 
-    public function replacePassword($passwordName, $passwordValue)
+    public function replacePassword($passwordName, $passwordValue): void
     {
         $passwords = $this->getPasswords();
         $passwords[$passwordName] = $passwordValue;

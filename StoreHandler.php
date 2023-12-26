@@ -4,8 +4,8 @@ require_once 'Store.php';
 
 class StoreHandler
 {
-    private $store;
-    private $passwordEncryptor;
+    private mixed $store;
+    private mixed $passwordEncryptor;
 
     public function __construct($storeClass,  $passwordEncryptorClass)
     {
@@ -13,28 +13,35 @@ class StoreHandler
         $this->passwordEncryptor = new $passwordEncryptorClass(ENCRYPTION_KEY); // Ensure ENCRYPTION_KEY is defined
     }
 
-    public function inputActions(): string
+    public function showMessage(string $message): void
     {
-        $action = readline("Enter your choice action: ");
-        return $action;
+        echo $message . "\n";
     }
 
-    public function inputPassword()
+
+    public function inputActions(): string
     {
-        $passwordName = readline("Enter password name: ");
-        $passwordValue = readline("Enter password value: ");
+        return readline("Enter your choice action: ");
+    }
+
+    public function inputPassword(): void
+    {
+        $passwordName = trim(readline("Enter password name: "));
+        $passwordValue = trim(readline("Enter password value: "));
+
         $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
         $this->store->setPassword($passwordName, $encryptedPassword);
     }
 
-    public function showAllPasswords()
+    public function showAllPasswords(): void
     {
         $this->store->showAllPasswords();
     }
 
-    public function getPassword()
+    public function getPassword(): void
     {
-        $passwordName = readline("Enter password name: ");
+        $passwordName = trim(readline("Enter password name: "));
+
         $passwordValue = $this->store->getPassword($passwordName);
         if ($passwordValue !== null) {
             $decryptedPassword = $this->passwordEncryptor->decryptPassword($passwordValue);
@@ -44,16 +51,21 @@ class StoreHandler
         }
     }
 
-    public function deletePassword()
+    public function deletePassword(): void
     {
         $passwordName = readline("Enter password name: ");
         $this->store->deletePassword($passwordName);
     }
 
-    public function replacePassword()
+    public function replacePassword(): void
     {
-        $passwordName = readline("Enter password name: ");
-        $passwordValue = readline("Enter password value: ");
-        $this->store->replacePassword($passwordName, $passwordValue);
+        $passwordName = trim(readline("Enter password name: "));
+        $passwordValue = trim(readline("Enter password value: "));
+
+
+
+        $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
+        $this->store->replacePassword($passwordName, $encryptedPassword);
     }
+
 }

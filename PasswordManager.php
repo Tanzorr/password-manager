@@ -20,35 +20,41 @@ class PasswordManager
         }
     }
 
-    private function showMenu()
+    private function showMenu(): void
     {
         echo "\nMenu actions: \n";
-        echo "1. Show password\n";
-        echo "2. Add password\n";
-        echo "3. Delete password\n";
-        echo "4. Change password\n";
-        echo "5. Show all passwords names\n";
+        echo "show. Show password\n";
+        echo "add. Add password\n";
+        echo "delete. Delete password\n";
+        echo "change. Change password\n";
+        echo "show all. Show all passwords names\n";
         echo "q. Exit\n";
     }
 
-    private function getChosenPassword()
+    private function getUnknownAction(): void
+    {
+        echo "Unknown action. Please try again\n";
+        $this->showMenu();
+    }
+
+    private function getChosenPassword(): void
     {
         $selectedChoiceFromMenu = $this->storeHandler->inputActions();
         $this->processChoice($selectedChoiceFromMenu);
     }
 
-    private function processChoice($choice)
+    private function processChoice($choice): void
     {
         match ($choice) {
-            '1' => $this->storeHandler->getPassword(),
-            '2' => $this->storeHandler->inputPassword(),
-            '3' => $this->storeHandler->deletePassword(),
-            '4' => $this->storeHandler->replacePassword(),
-            '5' => $this->storeHandler->showAllPasswords(),
+            'show' => $this->storeHandler->getPassword(),
+            'add' => $this->storeHandler->inputPassword(),
+            'delete' => $this->storeHandler->deletePassword(),
+            'change' => $this->storeHandler->replacePassword(),
+            'show all' => $this->storeHandler->showAllPasswords(),
             'q' => exit(),
-            default => $this->showMenu(),
+            default => $this->getUnknownAction(),
         };
     }
 }
 
-?>
+// Path: PasswordEncryptor.php
