@@ -27,7 +27,9 @@ class StoreHandler
     public function inputPassword(): void
     {
         $passwordName = trim(readline("Enter password name: "));
+        $this->showEmptyFieldError('password name',$passwordName);
         $passwordValue = trim(readline("Enter password value: "));
+        $this->showEmptyFieldError('password value',$passwordValue);
 
         $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
         $this->store->setPassword($passwordName, $encryptedPassword);
@@ -41,6 +43,7 @@ class StoreHandler
     public function getPassword(): void
     {
         $passwordName = trim(readline("Enter password name: "));
+        $this->showEmptyFieldError('password name',$passwordName);
 
         $passwordValue = $this->store->getPassword($passwordName);
         if ($passwordValue !== null) {
@@ -54,18 +57,26 @@ class StoreHandler
     public function deletePassword(): void
     {
         $passwordName = readline("Enter password name: ");
+        $this->showEmptyFieldError('password name',$passwordName);
         $this->store->deletePassword($passwordName);
     }
 
     public function replacePassword(): void
     {
         $passwordName = trim(readline("Enter password name: "));
+        $this->showEmptyFieldError('password name',$passwordName);
         $passwordValue = trim(readline("Enter password value: "));
-
-
+        $this->showEmptyFieldError('password value',$passwordValue);
 
         $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
         $this->store->replacePassword($passwordName, $encryptedPassword);
     }
 
+    private function showEmptyFieldError($fieldName, $fieldValue): void
+    {
+        if($fieldValue === '') {
+            $this->showMessage("$fieldName can't be empty.");
+            return;
+        }
+    }
 }
