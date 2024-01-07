@@ -26,6 +26,7 @@ class StoreHandler implements StoreHandlerInterface
     {
         return readline("Enter your choice action: ");
     }
+
     public function inputPassword(): void
     {
         $passwordName = $this->getField('password name');
@@ -33,23 +34,12 @@ class StoreHandler implements StoreHandlerInterface
 
         $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
         $this->store->setPassword($passwordName, $encryptedPassword);
+        echo "Password added.\n";
     }
 
     public function showAllPasswords(): void
     {
         $this->store->showAllPasswords();
-    }
-
-    private function getField($fieldName)
-    {
-        $fieldValue = trim(readline("Enter $fieldName: "));
-        if ($fieldValue === '') {
-            echo "$fieldName can't be empty.\n";
-
-            return $this->getField($fieldName);
-        } else {
-            return $fieldValue;
-        }
     }
 
     public function getPassword(): void
@@ -100,5 +90,17 @@ class StoreHandler implements StoreHandlerInterface
         $this->store->replacePassword($passwordName, $encryptedPassword);
 
         echo "Password replaced.\n";
+    }
+
+    private function getField($fieldName)
+    {
+        $fieldValue = trim(readline("Enter $fieldName: "));
+        if ($fieldValue === '') {
+            echo "$fieldName can't be empty.\n";
+
+            return $this->getField($fieldName);
+        } else {
+            return $fieldValue;
+        }
     }
 }
