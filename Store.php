@@ -19,8 +19,7 @@ class Store
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
-        $passwords = json_encode($passwords);
-        file_put_contents($this->passwordsFile, $passwords);
+        $this->writePasswordsFile($passwords);
     }
 
     public function getPassword($passwordName)
@@ -33,8 +32,7 @@ class Store
     {
         $passwords = $this->readPasswordsFile();
         unset($passwords[$passwordName]);
-        $passwords = json_encode($passwords);
-        file_put_contents($this->passwordsFile, $passwords);
+        $this->writePasswordsFile($passwords);
     }
 
     public function showAllPasswords(): void
@@ -50,10 +48,15 @@ class Store
         }
     }
 
-    public function replacePassword($passwordName, $passwordValue): void
+    private function replacePassword($passwordName, $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
+        $this->writePasswordsFile($passwords);
+    }
+
+    private function writePasswordsFile($passwords): void
+    {
         $passwords = json_encode($passwords);
         file_put_contents($this->passwordsFile, $passwords);
     }
