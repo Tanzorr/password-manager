@@ -82,7 +82,6 @@ class StoreHandler implements StoreHandlerInterface
     public function replacePassword(): void
     {
         $passwordName = $this->getField('password name');
-        $passwordValue = $this->getField('password value');
         $oldPasswordValue = $this->store->getPassword($passwordName);
 
         if ($oldPasswordValue === null) {
@@ -90,6 +89,7 @@ class StoreHandler implements StoreHandlerInterface
             return;
         } else {
             $decryptedPassword = $this->passwordEncryptor->decryptPassword($oldPasswordValue);
+            $passwordValue = $this->getField('password value');
 
             if ($decryptedPassword === $passwordValue) {
                 echo "New password can't be the same as old password.\n";
@@ -100,13 +100,5 @@ class StoreHandler implements StoreHandlerInterface
         $this->store->replacePassword($passwordName, $encryptedPassword);
 
         echo "Password replaced.\n";
-    }
-
-    private function showEmptyFieldError($fieldName, $fieldValue): void
-    {
-        if ($fieldValue === '') {
-            echo "$fieldName can't be empty.\n";
-            return;
-        }
     }
 }

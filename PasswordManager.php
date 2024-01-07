@@ -13,9 +13,8 @@ class PasswordManager
     {
         echo "Welcome to Password Manager!\n";
 
-        $this->showMenu();
-
         while (true) {
+            $this->showMenu();
             $this->getChosenPassword();
         }
     }
@@ -30,13 +29,6 @@ class PasswordManager
         echo "show all. Show all passwords names\n";
         echo "q. Exit\n";
     }
-
-    private function getUnknownAction(): void
-    {
-        echo "Unknown action. Please try again\n";
-        $this->showMenu();
-    }
-
     private function getChosenPassword(): void
     {
         $selectedChoiceFromMenu = $this->storeHandler->inputActions();
@@ -51,8 +43,21 @@ class PasswordManager
             'delete' => $this->storeHandler->deletePassword(),
             'change' => $this->storeHandler->replacePassword(),
             'show all' => $this->storeHandler->showAllPasswords(),
-            'q' => exit(),
+            'q' => $this->exitApplication(),
             default => $this->getUnknownAction(),
         };
     }
+
+    private function getUnknownAction(): void
+    {
+        echo "Unknown action. Please try again\n";
+        $this->showMenu();
+    }
+
+    public function exitApplication(): void
+    {
+        echo "Exiting Password Manager. Goodbye!\n";
+        exit;
+    }
+
 }
