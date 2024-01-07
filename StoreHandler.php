@@ -2,7 +2,16 @@
 
 require_once 'Store.php';
 
-class StoreHandler
+interface StoreHandlerInterface {
+    public function inputActions(): string;
+    public function getPassword(): void;
+    public function inputPassword(): void;
+    public function deletePassword(): void;
+    public function replacePassword(): void;
+    public function showAllPasswords(): void;
+}
+
+class StoreHandler implements StoreHandlerInterface
 {
     private mixed $store;
     private mixed $passwordEncryptor;

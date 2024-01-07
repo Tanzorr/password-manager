@@ -4,9 +4,9 @@ class PasswordManager
 {
     private $storeHandler;
 
-    public function __construct(string $storeHandlerClass, string $storeClass)
+    public function __construct(StoreHandler $storeHandler)
     {
-        $this->storeHandler = new $storeHandlerClass(new $storeClass(), new PasswordEncryptor(ENCRYPTION_KEY));
+        $this->storeHandler = $storeHandler;
     }
 
     public function run()
@@ -56,5 +56,3 @@ class PasswordManager
         };
     }
 }
-
-// Path: PasswordEncryptor.php

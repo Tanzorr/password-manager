@@ -5,5 +5,6 @@ require_once 'Store.php';
 require_once 'PasswordManager.php';
 
 
-$passwordManager = new PasswordManager(StoreHandler::class, Store::class);
+$storeHandler = new StoreHandler(Store::class, PasswordEncryptor::class);
+$passwordManager = new PasswordManager($storeHandler);
 $passwordManager->run();
