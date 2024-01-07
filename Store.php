@@ -3,18 +3,6 @@
 class Store
 {
     private string $passwordsFile = 'passwords.json';
-    private function readPasswordsFile(): array
-    {
-        $passwords = @file_get_contents($this->passwordsFile);
-
-        if ($passwords === false) {
-            return [];
-        }
-
-        return json_decode($passwords, true) ?? [];
-    }
-
-
     public function setPassword($passwordName, $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
@@ -48,12 +36,24 @@ class Store
         }
     }
 
-    private function replacePassword($passwordName, $passwordValue): void
+    public function replacePassword($passwordName, $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
         $this->writePasswordsFile($passwords);
     }
+
+    private function readPasswordsFile(): array
+    {
+        $passwords = @file_get_contents($this->passwordsFile);
+
+        if ($passwords === false) {
+            return [];
+        }
+
+        return json_decode($passwords, true) ?? [];
+    }
+
 
     private function writePasswordsFile($passwords): void
     {
