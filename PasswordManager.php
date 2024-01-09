@@ -2,7 +2,7 @@
 
 class PasswordManager
 {
-    private $storeHandler;
+    private StoreHandler $storeHandler;
 
     public function __construct(StoreHandler $storeHandler)
     {
