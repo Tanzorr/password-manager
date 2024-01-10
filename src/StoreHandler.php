@@ -32,7 +32,7 @@ class StoreHandler implements StoreHandlerInterface
         $passwordName = $this->getField('password name');
         $passwordValue = $this->getField('password value');
 
-        $encryptedPassword = $this->passwordEncryptor->encryptPassword($passwordValue);
+        $encryptedPassword = $this->passwordEncryptor->encrypt($passwordValue);
         $this->store->setPassword($passwordName, $encryptedPassword);
         echo "Password added.\n";
     }
@@ -48,7 +48,7 @@ class StoreHandler implements StoreHandlerInterface
 
         $passwordValue = $this->store->getPassword($passwordName);
         if ($passwordValue !== null) {
-            $decryptedPassword = $this->passwordEncryptor->decryptPassword($passwordValue);
+            $decryptedPassword = $this->passwordEncryptor->decrypt($passwordValue);
 
             echo "Password: $decryptedPassword\n";
         } else {
