@@ -1,9 +1,9 @@
 <?php
-require_once 'StoreHandler.php';
-require_once 'PasswordEncryptor.php';
-require_once 'Store.php';
-require_once 'PasswordManager.php';
 
+spl_autoload_register(function ($class) {
+    $class = str_replace('\\', '/', $class);
+    require_once __DIR__ . "/$class.php";
+});
 
 $storeHandler = new StoreHandler(Store::class, PasswordEncryptor::class);
 $passwordManager = new PasswordManager($storeHandler);
