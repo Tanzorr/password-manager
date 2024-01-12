@@ -10,6 +10,6 @@ class IO
         public function expect($text): string
         {
                 echo $text . "\n";
-                return readline();
+                return trim(readline());
         }
 }
