@@ -2,11 +2,16 @@
 
 class PasswordManager
 {
-    private StoreHandler $storeHandler;
+    private $io;
+    private $store;
 
-    public function __construct(StoreHandler $storeHandler)
+    private $askHelper;
+
+    public function __construct(IO $io, Store $store, AskHelper $askHelper)
     {
-        $this->storeHandler = $storeHandler;
+       $this->io = $io;
+       $this->store = $store;
+       $this->askHelper = $askHelper;
     }
 
     public function run()
@@ -15,7 +20,7 @@ class PasswordManager
 
         while (true) {
             $this->showMenu();
-            $this->getChosenPassword();
+            $this->getChosenAction();
         }
     }
 
@@ -29,35 +34,46 @@ class PasswordManager
         echo "show all. Show all passwords names\n";
         echo "q. Exit\n";
     }
-    private function getChosenPassword(): void
+    private function getChosenAction(): void
     {
-        $selectedChoiceFromMenu = $this->storeHandler->inputActions();
-        $this->processChoice($selectedChoiceFromMenu);
-    }
+        $action = $this->io->expect("Choose action: ");
 
-    private function processChoice($choice): void
-    {
-        match ($choice) {
-            'show' => $this->storeHandler->getPassword(),
-            'add' => $this->storeHandler->inputPassword(),
-            'delete' => $this->storeHandler->deletePassword(),
-            'change' => $this->storeHandler->replacePassword(),
-            'show all' => $this->storeHandler->showAllPasswords(),
-            'q' => $this->exitApplication(),
-            default => $this->getUnknownAction(),
+        match ($action) {
+            "show all" => $this->store->showAllPasswords(),
+            "add" => $this->addPassword(),
+            "show" => $this->showPassword(),
+            "delete" => $this->deletePassword(),
+            "change" => $this->changePassword(),
+            "q" => exit(),
+            default => $this->io->writeln("Unknown action"),
         };
     }
 
-    private function getUnknownAction(): void
+    private function addPassword(): void
     {
-        echo "Unknown action. Please try again\n";
-        $this->showMenu();
+        $passwordName = $this->askHelper->askPasswordName();
+        $passwordValue = $this->askHelper->askPasswordValue();
+
+        $this->store->addPassword($passwordName, $passwordValue);
     }
 
-    public function exitApplication(): void
+    private function showPassword(): void
     {
-        echo "Exiting Password Manager. Goodbye!\n";
-        exit;
+        $passwordName = $this->askHelper->askPasswordName();
+        $this->store->getPassword($passwordName);
     }
 
+    private function deletePassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $this->store->deletePassword($passwordName);
+    }
+
+    private function changePassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $passwordValue = $this->askHelper->askPasswordValue();
+
+        $this->store->changePassword($passwordName, $passwordValue);
+    }
 }

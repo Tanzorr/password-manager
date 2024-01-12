@@ -2,11 +2,11 @@
 
 const ENCRYPTION_KEY = 'superstructure';
 
-class PasswordEncryptor
+class Encryptor
 {
-    private  string $encryptionKey;
 
-    public function __construct($encryptionKey)
+    private $encryptionKey = '';
+    public function __construct($encryptionKey = ENCRYPTION_KEY)
     {
         $this->encryptionKey = $encryptionKey;
     }

@@ -13,7 +13,7 @@ class Filesystem
         return file_put_contents($path, $content);
     }
 
-    public function exists($path)
+    public function exists($path): bool
     {
         return file_exists($path);
     }
