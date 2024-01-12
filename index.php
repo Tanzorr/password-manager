@@ -6,7 +6,6 @@ spl_autoload_register(function ($className) {
 
 $io = new IO();
 
-
 $askHelper = new AskHelper($io);
 
 $store =  new Store(
@@ -17,6 +16,5 @@ $store =  new Store(
     $io
 );
 
-$storeHandler = new StoreHandler(Store::class, Encryptor::class);
 $passwordManager = new PasswordManager($io, $store, $askHelper);
 $passwordManager->run();
