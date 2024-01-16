@@ -35,12 +35,15 @@ class Store
         $this->io->writeln("$passwordName Password added.");
     }
 
-    public function getPassword($passwordName): void
+    public function getPassword($passwordName): string
     {
         $passwords = $this->readPasswordsFile();
 
         if($this->isPasswordExist($passwordName)){
-            $this->io->writeln($this->encryptor->decrypt($passwords[$passwordName]));
+          return  $this->encryptor->decrypt($passwords[$passwordName]);
+        }else{
+          $this->io->writeln('Password not found.');
+          return false;
         }
     }
 

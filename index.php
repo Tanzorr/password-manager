@@ -16,5 +16,14 @@ $store =  new Store(
     $io
 );
 
-$passwordManager = new PasswordManager($io, $store, $askHelper);
+$auth = new Auth($store);
+
+$auth->login($io->expect("Master password: "));
+
+if(!$auth->isAuth()){
+    $io->writeln("Wrong password.");
+    exit;
+}
+
+$passwordManager = new PasswordManager($io, $store, $askHelper, $auth);
 $passwordManager->run();

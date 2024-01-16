@@ -7,11 +7,14 @@ class PasswordManager
 
     private $askHelper;
 
-    public function __construct(IO $io, Store $store, AskHelper $askHelper)
+    private $auth;
+
+    public function __construct(IO $io, Store $store, AskHelper $askHelper, Auth $auth)
     {
-       $this->io = $io;
-       $this->store = $store;
-       $this->askHelper = $askHelper;
+        $this->io = $io;
+        $this->store = $store;
+        $this->askHelper = $askHelper;
+        $this->auth = $auth;
     }
 
     public function run()
@@ -34,6 +37,7 @@ class PasswordManager
         echo "show all. Show all passwords names\n";
         echo "q. Exit\n";
     }
+
     private function getChosenAction(): void
     {
         $action = $this->io->expect("Choose action: ");
@@ -44,7 +48,7 @@ class PasswordManager
             "show" => $this->showPassword(),
             "delete" => $this->deletePassword(),
             "change" => $this->changePassword(),
-            "q" => exit(),
+            "q" => $this->logout(),
             default => $this->io->writeln("Unknown action"),
         };
     }
@@ -60,7 +64,7 @@ class PasswordManager
     private function showPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        $this->store->getPassword($passwordName);
+        $this->io->writeln($this->store->getPassword($passwordName));
     }
 
     private function deletePassword(): void
@@ -75,5 +79,11 @@ class PasswordManager
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->store->changePassword($passwordName, $passwordValue);
+    }
+
+    private function logout(): void
+    {
+        $this->auth->logout();
+        exit();
     }
 }
