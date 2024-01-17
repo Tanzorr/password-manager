@@ -15,7 +15,7 @@ class Store
         Filesystem   $filesystem = null,
         Encryptor    $encryptor = null,
         string       $passToFile = null,
-                     $masterPass = null,
+        string       $masterPass = null,
         InputOoutput $io = null
     )
     {
@@ -27,7 +27,7 @@ class Store
         $this->io = $io ?? new InputOoutput();
     }
 
-    public function addPassword($passwordName, $passwordValue): void
+    public function addPassword(string $passwordName, string $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $this->encryptor->encrypt($passwordValue);
@@ -51,7 +51,7 @@ class Store
         }
     }
 
-    public function deletePassword($passwordName): void
+    public function deletePassword(string $passwordName): void
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
@@ -91,7 +91,7 @@ class Store
         return json_decode($passwords, true);
     }
 
-    public function changePassword($passwordName, $newPasswordValue): void
+    public function changePassword(string $passwordName, string $newPasswordValue): void
     {
         $passwords = $this->readPasswordsFile();
         $encryptNewPasswordValue = $this->encryptor->encrypt($newPasswordValue);
@@ -103,7 +103,7 @@ class Store
         }
     }
 
-    private function isPasswordExist($passwordName): bool
+    private function isPasswordExist(string $passwordName): bool
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
