@@ -2,4 +2,4 @@
 .env
 .idea
 passwords.json
-.env
+config.php

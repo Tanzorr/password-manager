@@ -1,13 +1,15 @@
 <?php
 
+use JetBrains\PhpStorm\NoReturn;
+
 class PasswordManager
 {
-    private $io;
-    private $store;
+    private InputOoutput $io;
+    private Store $store;
 
-    private $askHelper;
+    private AskHelper $askHelper;
 
-    private $auth;
+    private Auth $auth;
 
     public function __construct(InputOoutput $io, Store $store, AskHelper $askHelper, Auth $auth)
     {
@@ -19,7 +21,7 @@ class PasswordManager
 
     public function run()
     {
-        echo "Welcome to Password Manager!\n";
+       $this->io->writeln("Welcome to Password Manager");
 
         while (true) {
             $this->showMenu();
@@ -83,7 +85,7 @@ class PasswordManager
         $this->store->changePassword($passwordName, $passwordValue);
     }
 
-    private function logout(): void
+    #[NoReturn] private function logout(): void
     {
         $this->auth->logout();
         exit();

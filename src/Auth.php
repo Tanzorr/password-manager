@@ -2,14 +2,13 @@
 
 class Auth
 {
-    private Store $store;
-
     private string $masterPassword;
+    private InputOoutput $io;
 
-    public function __construct(Store $store, string $masterPassword)
+    public function __construct(string $masterPassword, InputOoutput $io = null)
     {
-        $this->store = $store;
         $this->masterPassword = $masterPassword;
+        $this->io = $io ?? new InputOoutput();
     }
 
     public function login($password): void
@@ -19,19 +18,21 @@ class Auth
             session_start();
 
             $_SESSION['auth'] = true;
+        }else{
+            $this->io->writeln("Wrong password.");
         }
     }
 
     public function logout(): void
     {
-        if (session_status() === PHP_SESSION_ACTIVE) {
+        if (isset($_SESSION['auth'])) {
             unset($_SESSION['auth']);
             session_destroy();
         }
+        session_abort();
     }
     public function isAuth(): bool
     {
         return $_SESSION['auth'] ?? false;
     }
-
 }

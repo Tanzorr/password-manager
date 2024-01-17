@@ -1,5 +1,5 @@
 <?php
-global $userPassword, $passwordsFile, $encryptKay;
+global $userPassword, $passwordsFilePath, $encryptKay;
 
 require_once __DIR__ . "/config.php";
 
@@ -14,17 +14,16 @@ $askHelper = new AskHelper($inputOutput);
 $store =  new Store(
     new Filesystem(),
     new Encryptor($encryptKay),
-    $passwordsFile,
-    null,
+    $passwordsFilePath,
     $inputOutput
 );
 
-$auth = new Auth($store, $userPassword);
+$auth = new Auth($userPassword, $inputOutput);
 
 $auth->login($inputOutput->expect("Master password: "));
 
 if(!$auth->isAuth()){
-    $inputOutput->writeln("Wrong password.");
+    $inputOutput->writeln("Please login.");
     exit;
 }
 

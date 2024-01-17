@@ -2,28 +2,23 @@
 
 class Store
 {
-    private $passwordsFile = '';
-    private $masterPass;
+    private string $passwordsFilePath = '';
+    private Filesystem $filesystem;
+    private Encryptor $encryptor;
 
-    private $filesystem;
-    private $encryptor;
-    private $passToFile;
-
-    private $io;
+    private InputOoutput $io;
 
     public function __construct(
         Filesystem   $filesystem = null,
         Encryptor    $encryptor = null,
-        string       $passToFile = null,
-        string       $masterPass = null,
+        string       $passToFile = '',
+
         InputOoutput $io = null
     )
     {
-        $this->passwordsFile = $passToFile;
+        $this->passwordsFilePath = $passToFile;
         $this->filesystem = $filesystem ?? new Filesystem();
         $this->encryptor = $encryptor ?? new Encryptor();
-        $this->passToFile = $passToFile;
-        $this->masterPass = $masterPass;
         $this->io = $io ?? new InputOoutput();
     }
 
@@ -31,7 +26,7 @@ class Store
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $this->encryptor->encrypt($passwordValue);
-        $this->filesystem->put($this->passwordsFile, json_encode($passwords));
+        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
         $this->io->writeln("$passwordName Password added.");
     }
 
@@ -60,7 +55,7 @@ class Store
         }
 
         unset($passwords[$passwordName]);
-        $this->filesystem->put($this->passwordsFile, json_encode($passwords));
+        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
     }
 
     public function showAllPasswords(): void
@@ -78,11 +73,11 @@ class Store
 
     private function readPasswordsFile(): string|array
     {
-        if (!$this->filesystem->exists($this->passwordsFile)) {
+        if (!$this->filesystem->exists($this->passwordsFilePath)) {
             $this->io->writeln("No passwords found.");
         }
 
-        $passwords = $this->filesystem->get($this->passwordsFile);
+        $passwords = $this->filesystem->get($this->passwordsFilePath);
 
         if ($passwords === false || $passwords === '') {
             return [];
@@ -98,7 +93,7 @@ class Store
 
         if ($this->isPasswordExist($passwordName)) {
             $passwords[$passwordName] = $encryptNewPasswordValue;
-            $this->filesystem->put($this->passwordsFile, json_encode($passwords));
+            $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
             $this->io->writeln("Password $passwordName changed.");
         }
     }
