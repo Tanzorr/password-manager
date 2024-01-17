@@ -1,13 +1,13 @@
 <?php
 
-class IO
+class InputOoutput
 {
-        public function writeln($text): void
+        public function writeln(string $text): void
         {
                 echo $text . "\n";
         }
 
-        public function expect($text): string
+        public function expect(string $text): string
         {
                 echo $text . "\n";
                 return trim(readline());

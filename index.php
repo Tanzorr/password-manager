@@ -1,29 +1,32 @@
 <?php
+global $userPassword, $passwordsFile, $encryptKay;
+
+require_once __DIR__ . "/config.php";
 
 spl_autoload_register(function ($className) {
     require_once __DIR__ . "/src/$className.php";
 });
 
-$io = new IO();
+$inputOutput = new InputOoutput();
 
-$askHelper = new AskHelper($io);
+$askHelper = new AskHelper($inputOutput);
 
 $store =  new Store(
     new Filesystem(),
-    new Encryptor(),
-    "passwords.json",
+    new Encryptor($encryptKay),
+    $passwordsFile,
     null,
-    $io
+    $inputOutput
 );
 
-$auth = new Auth($store);
+$auth = new Auth($store, $userPassword);
 
-$auth->login($io->expect("Master password: "));
+$auth->login($inputOutput->expect("Master password: "));
 
 if(!$auth->isAuth()){
-    $io->writeln("Wrong password.");
+    $inputOutput->writeln("Wrong password.");
     exit;
 }
 
-$passwordManager = new PasswordManager($io, $store, $askHelper, $auth);
+$passwordManager = new PasswordManager($inputOutput, $store, $askHelper, $auth);
 $passwordManager->run();

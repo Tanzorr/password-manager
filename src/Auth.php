@@ -2,21 +2,20 @@
 
 class Auth
 {
-    private $store;
+    private Store $store;
 
-    private $masterPassword;
+    private string $masterPassword;
 
-    public function __construct(Store $store)
+    public function __construct(Store $store, string $masterPassword)
     {
         $this->store = $store;
-        $this->masterPassword = 'master';
+        $this->masterPassword = $masterPassword;
     }
 
     public function login($password): void
     {
-        $masterPasswordValue = $this->store->getPassword($this->masterPassword);
 
-        if($password === $masterPasswordValue) {
+        if($password === $this->masterPassword) {
             session_start();
 
             $_SESSION['auth'] = true;

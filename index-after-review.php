@@ -22,7 +22,7 @@ Filesystem:
 Encryptor
  - encrypt
  - decrypt
-IO:
+InputOoutput:
  - writeln -> echo
  - expect -> readline
 
@@ -34,14 +34,14 @@ IO:
 - использовать spl_autoload_register для того чтобы подгружать любые классы из папки src
 - Когда создаёшь класс Store ты должен внутрь передававать новые обьекты а не названия класс
 Рефакторинг:
- - вытащить все упоминания echo в класс IO в которому буду функции expect(Ожидание ввода данных) и writeln (Вывод текста)
+ - вытащить все упоминания echo в класс InputOoutput в которому буду функции expect(Ожидание ввода данных) и writeln (Вывод текста)
  - Операции с файловой системой вытаскивай в класс Filesystem (file_get_contents, file_put_contents, file_exists)
 Переименуй классы:
  - Encryptor -> Encryptor, функции encrypt и decrypt. Это класс общего назначения и он не должен знать о существовании паролей вообще, он может использоваться в других целях
 */
 
 // результирующай код будет выглядеть примерно так
-$io = new IO();
+$io = new InputOoutput();
 $masterPass = $io->expect("Master password");
 
 $store = new Store(

@@ -9,7 +9,7 @@ class PasswordManager
 
     private $auth;
 
-    public function __construct(IO $io, Store $store, AskHelper $askHelper, Auth $auth)
+    public function __construct(InputOoutput $io, Store $store, AskHelper $askHelper, Auth $auth)
     {
         $this->io = $io;
         $this->store = $store;
@@ -64,7 +64,9 @@ class PasswordManager
     private function showPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        $this->io->writeln($this->store->getPassword($passwordName));
+        $passwordValue = $this->store->getPassword($passwordName);
+
+        $this->io->writeln($passwordValue);
     }
 
     private function deletePassword(): void

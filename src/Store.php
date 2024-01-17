@@ -12,11 +12,11 @@ class Store
     private $io;
 
     public function __construct(
-        Filesystem $filesystem = null,
-        Encryptor  $encryptor = null,
-        string     $passToFile = 'passwords.json',
-                   $masterPass = null,
-        IO         $io = null
+        Filesystem   $filesystem = null,
+        Encryptor    $encryptor = null,
+        string       $passToFile = null,
+                     $masterPass = null,
+        InputOoutput $io = null
     )
     {
         $this->passwordsFile = $passToFile;
@@ -24,7 +24,7 @@ class Store
         $this->encryptor = $encryptor ?? new Encryptor();
         $this->passToFile = $passToFile;
         $this->masterPass = $masterPass;
-        $this->io = $io ?? new IO();
+        $this->io = $io ?? new InputOoutput();
     }
 
     public function addPassword($passwordName, $passwordValue): void
@@ -35,22 +35,26 @@ class Store
         $this->io->writeln("$passwordName Password added.");
     }
 
-    public function getPassword($passwordName): string
+    public function getPassword(string $passwordName): string
     {
         $passwords = $this->readPasswordsFile();
+        if (!array_key_exists($passwordName, $passwords)) {
+            return "Password not found.";
+        }
 
-        if($this->isPasswordExist($passwordName)){
-          return  $this->encryptor->decrypt($passwords[$passwordName]);
-        }else{
-          $this->io->writeln('Password not found.');
-          return false;
+        $decryptPassword = $this->encryptor->decrypt($passwords[$passwordName]);
+
+        if ($decryptPassword) {
+            return $decryptPassword;
+        } else {
+            return 'Password not found.';
         }
     }
 
     public function deletePassword($passwordName): void
     {
         $passwords = $this->readPasswordsFile();
-        if(!array_key_exists($passwordName, $passwords)){
+        if (!array_key_exists($passwordName, $passwords)) {
             $this->io->writeln("Password not found.");
             return;
         }
@@ -92,7 +96,7 @@ class Store
         $passwords = $this->readPasswordsFile();
         $encryptNewPasswordValue = $this->encryptor->encrypt($newPasswordValue);
 
-        if($this->isPasswordExist($passwordName)){
+        if ($this->isPasswordExist($passwordName)) {
             $passwords[$passwordName] = $encryptNewPasswordValue;
             $this->filesystem->put($this->passwordsFile, json_encode($passwords));
             $this->io->writeln("Password $passwordName changed.");
@@ -102,7 +106,7 @@ class Store
     private function isPasswordExist($passwordName): bool
     {
         $passwords = $this->readPasswordsFile();
-        if(!array_key_exists($passwordName, $passwords)){
+        if (!array_key_exists($passwordName, $passwords)) {
             $this->io->writeln("Password not found.");
             return false;
         }

@@ -4,9 +4,9 @@ class AskHelper
 {
     private $io;
 
-    public function __construct(IO $io = null)
+    public function __construct(InputOoutput $io = null)
     {
-        $this->io = $io ?? new IO();
+        $this->io = $io ?? new InputOoutput();
     }
 
    public function askPasswordName(): string
