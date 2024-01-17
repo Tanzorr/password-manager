@@ -49,6 +49,7 @@ class Store
     public function deletePassword(string $passwordName): void
     {
         $passwords = $this->readPasswordsFile();
+
         if (!array_key_exists($passwordName, $passwords)) {
             $this->io->writeln("Password not found.");
             return;
@@ -105,6 +106,7 @@ class Store
             $this->io->writeln("Password not found.");
             return false;
         }
+
         return true;
     }
 }

@@ -11,7 +11,7 @@ class Auth
         $this->io = $io ?? new InputOoutput();
     }
 
-    public function login($password): void
+    public function login(string $password): void
     {
 
         if($password === $this->masterPassword) {

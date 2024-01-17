@@ -2,7 +2,7 @@
 
 class AskHelper
 {
-    private $io;
+    private InputOoutput $io;
 
     public function __construct(InputOoutput $io = null)
     {
