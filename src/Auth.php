@@ -9,16 +9,14 @@ class Auth
     {
         $this->masterPassword = $masterPassword;
         $this->io = $io ?? new InputOoutput();
+        session_start();
     }
 
     public function login(string $password): void
     {
-
-        if($password === $this->masterPassword) {
-            session_start();
-
+        if ($password === $this->masterPassword) {
             $_SESSION['auth'] = true;
-        }else{
+        } else {
             $this->io->writeln("Wrong password.");
         }
     }
@@ -29,8 +27,8 @@ class Auth
             unset($_SESSION['auth']);
             session_destroy();
         }
-        session_abort();
     }
+
     public function isAuth(): bool
     {
         return $_SESSION['auth'] ?? false;
