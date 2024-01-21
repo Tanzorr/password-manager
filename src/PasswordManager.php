@@ -1,0 +1,93 @@
+<?php
+
+use JetBrains\PhpStorm\NoReturn;
+
+class PasswordManager
+{
+    private InputOoutput $io;
+    private Store $store;
+
+    private AskHelper $askHelper;
+
+    private Auth $auth;
+
+    public function __construct(InputOoutput $io, Store $store, AskHelper $askHelper, Auth $auth)
+    {
+        $this->io = $io;
+        $this->store = $store;
+        $this->askHelper = $askHelper;
+        $this->auth = $auth;
+    }
+
+    public function run()
+    {
+       $this->io->writeln("Welcome to Password Manager");
+
+        while (true) {
+            $this->showMenu();
+            $this->getChosenAction();
+        }
+    }
+
+    private function showMenu(): void
+    {
+        echo "\nMenu actions: \n";
+        echo "show. Show password\n";
+        echo "add. Add password\n";
+        echo "delete. Delete password\n";
+        echo "change. Change password\n";
+        echo "show all. Show all passwords names\n";
+        echo "q. Exit\n";
+    }
+
+    private function getChosenAction(): void
+    {
+        $action = $this->io->expect("Choose action: ");
+
+        match ($action) {
+            "show all" => $this->store->showAllPasswords(),
+            "add" => $this->addPassword(),
+            "show" => $this->showPassword(),
+            "delete" => $this->deletePassword(),
+            "change" => $this->changePassword(),
+            "q" => $this->logout(),
+            default => $this->io->writeln("Unknown action"),
+        };
+    }
+
+    private function addPassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $passwordValue = $this->askHelper->askPasswordValue();
+
+        $this->store->addPassword($passwordName, $passwordValue);
+    }
+
+    private function showPassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $passwordValue = $this->store->getPassword($passwordName);
+
+        $this->io->writeln($passwordValue);
+    }
+
+    private function deletePassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $this->store->deletePassword($passwordName);
+    }
+
+    private function changePassword(): void
+    {
+        $passwordName = $this->askHelper->askPasswordName();
+        $passwordValue = $this->askHelper->askPasswordValue();
+
+        $this->store->changePassword($passwordName, $passwordValue);
+    }
+
+    #[NoReturn] private function logout(): void
+    {
+        $this->auth->logout();
+        exit();
+    }
+}
