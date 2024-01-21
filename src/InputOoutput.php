@@ -2,14 +2,13 @@
 
 class InputOoutput
 {
-        public function writeln(string $text): void
-        {
-                echo $text . "\n";
-        }
+    public function writeln(string $text): void
+    {
+        echo $text . "\n";
+    }
 
-        public function expect(string $text): string
-        {
-                echo $text . "\n";
-                return trim(readline());
-        }
+    public function expect(string $text): string
+    {
+        return trim(readline($text. ' >> '));
+    }
 }

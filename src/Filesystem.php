@@ -1,6 +1,6 @@
 <?php
 
-class Filesystem
+class Filesystem implements FilesystemInterface
 {
 
     public function get(string $path): string
@@ -16,5 +16,10 @@ class Filesystem
     public function exists(string $path): bool
     {
         return file_exists($path);
+    }
+
+    public function mkdir(string $path): bool
+    {
+        return mkdir($path);
     }
 }

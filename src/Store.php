@@ -3,29 +3,24 @@
 class Store
 {
     private string $passwordsFilePath = '';
-    private Filesystem $filesystem;
-    private Encryptor $encryptor;
-
+    private FilesystemInterface $filesystem;
     private InputOoutput $io;
 
     public function __construct(
-        Filesystem   $filesystem = null,
-        Encryptor    $encryptor = null,
-        string       $passToFile = '',
-
-        InputOoutput $io = null
+        FilesystemInterface $filesystem = null,
+        string              $passToFile = '',
+        InputOoutput        $io = null
     )
     {
         $this->passwordsFilePath = $passToFile;
         $this->filesystem = $filesystem ?? new Filesystem();
-        $this->encryptor = $encryptor ?? new Encryptor();
         $this->io = $io ?? new InputOoutput();
     }
 
     public function addPassword(string $passwordName, string $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
-        $passwords[$passwordName] = $this->encryptor->encrypt($passwordValue);
+        $passwords[$passwordName] = $passwordValue;
         $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
         $this->io->writeln("$passwordName Password added.");
     }
@@ -37,7 +32,7 @@ class Store
             return "Password not found.";
         }
 
-        $decryptPassword = $this->encryptor->decrypt($passwords[$passwordName]);
+        $decryptPassword = $passwords[$passwordName];
 
         if ($decryptPassword) {
             return $decryptPassword;
@@ -67,33 +62,33 @@ class Store
             return;
         }
 
+        $this->io->writeln("=== Password list ===");
         foreach ($passwords as $key => $value) {
-            $this->io->writeln("Password name: " . $key);
+            $this->io->writeln("- " . $key);
         }
+        $this->io->writeln("=== ^^^^^^^^^^^^^ ===");
     }
 
     private function readPasswordsFile(): string|array
     {
         if (!$this->filesystem->exists($this->passwordsFilePath)) {
-            $this->io->writeln("No passwords found.");
+            $this->filesystem->put($this->passwordsFilePath, json_encode([]));
         }
 
-        $passwords = $this->filesystem->get($this->passwordsFilePath);
+        $jsonContent = $this->filesystem->get($this->passwordsFilePath);
 
-        if ($passwords === false || $passwords === '') {
-            return [];
+        if ($jsonContent === false || $jsonContent === '') {
+            throw new LogicException('Access denied.');
         }
 
-        return json_decode($passwords, true);
+        return json_decode($jsonContent, true);
     }
 
     public function changePassword(string $passwordName, string $newPasswordValue): void
     {
         $passwords = $this->readPasswordsFile();
-        $encryptNewPasswordValue = $this->encryptor->encrypt($newPasswordValue);
-
         if ($this->isPasswordExist($passwordName)) {
-            $passwords[$passwordName] = $encryptNewPasswordValue;
+            $passwords[$passwordName] = $newPasswordValue;
             $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
             $this->io->writeln("Password $passwordName changed.");
         }
