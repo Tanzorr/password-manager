@@ -1,4 +1,6 @@
 .docker
 .env
 .idea
-
+./passwords.json
+config.php
+passwords.json
