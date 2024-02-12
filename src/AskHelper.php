@@ -2,11 +2,11 @@
 
 class AskHelper
 {
-    private InputOoutput $io;
+    private InputOutput $io;
 
-    public function __construct(InputOoutput $io = null)
+    public function __construct(InputOutput $io = null)
     {
-        $this->io = $io ?? new InputOoutput();
+        $this->io = $io ?? new InputOutput();
     }
 
    public function askPasswordName(): string

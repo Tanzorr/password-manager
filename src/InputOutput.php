@@ -1,6 +1,6 @@
 <?php
 
-class InputOoutput
+class InputOutput
 {
         public function writeln(string $text): void
         {

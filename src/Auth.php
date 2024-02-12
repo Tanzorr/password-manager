@@ -3,12 +3,12 @@
 class Auth
 {
     private string $masterPassword;
-    private InputOoutput $io;
+    private InputOutput $io;
 
-    public function __construct(string $masterPassword, InputOoutput $io = null)
+    public function __construct(string $masterPassword, InputOutput $io = null)
     {
         $this->masterPassword = $masterPassword;
-        $this->io = $io ?? new InputOoutput();
+        $this->io = $io ?? new InputOutput();
         session_start();
     }
 
