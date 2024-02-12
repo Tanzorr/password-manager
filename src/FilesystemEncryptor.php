@@ -23,9 +23,4 @@ class FilesystemEncryptor implements FilesystemInterface
     {
         return $this->filesystem->put($path, $this->encryptKay->encrypt($content));
     }
-
-//    public function mkdir(string $path): bool
-//    {
-//        return $this->filesystem->mkdir($path);
-//    }
 }

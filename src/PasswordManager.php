@@ -18,7 +18,7 @@ class PasswordManager
 
     public function run(): void
     {
-       $this->io->writeln("Welcome to Password Manager");
+        $this->io->writeln("Welcome to Password Manager");
 
         while (true) {
             $this->showMenu();
@@ -30,21 +30,24 @@ class PasswordManager
 
     private function showMenu(): void
     {
-        echo str_repeat('=',20);
-        echo "Menu actions: \n";
-        echo "[s] Show password\n";
-        echo "[a] Add password\n";
-        echo "[d] Delete password\n";
-        echo "[c] Change password\n";
-        echo "[l] List all passwords names\n";
-        echo "[q] Exit\n";
-        echo str_repeat('=',20).PHP_EOL;
+        $this->io->writeln("===============");
+        $this->io->writeln("Menu actions:");
+        $this->io->writeln("[s] Show password");
+        $this->io->writeln("[a] Add password");
+        $this->io->writeln("[d] Delete password");
+        $this->io->writeln("[c] Change password");
+        $this->io->writeln("[l] List all passwords names");
+        $this->io->writeln("[q] Exit");
+        $this->io->writeln("===============");
     }
 
+    /**
+     * @throws Exception
+     */
     private function getChosenAction(string $action): void
     {
         match ($action) {
-            "l" => $this->store->showAllPasswords(),
+            "l" => $this->showAllPasswords(),
             "a" => $this->addPassword(),
             "s" => $this->showPassword(),
             "d" => $this->deletePassword(),
@@ -54,6 +57,9 @@ class PasswordManager
         };
     }
 
+    /**
+     * @throws Exception
+     */
     private function addPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
@@ -62,6 +68,9 @@ class PasswordManager
         $this->store->addPassword($passwordName, $passwordValue);
     }
 
+    /**
+     * @throws Exception
+     */
     private function showPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
@@ -70,18 +79,39 @@ class PasswordManager
         $this->io->writeln($passwordValue);
     }
 
+    /**
+     * @throws Exception
+     */
     private function deletePassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
         $this->store->deletePassword($passwordName);
     }
 
+    /**
+     * @throws Exception
+     */
     private function changePassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->store->changePassword($passwordName, $passwordValue);
+    }
+
+    private function showAllPasswords(): void
+    {
+        try {
+            $passwords = $this->store->getAllPasswords();
+            $this->io->writeln("===============");
+            foreach ($passwords as $key => $value) {
+                $this->io->writeln("Password name: " . $key);
+            }
+            $this->io->writeln("===============");
+
+        } catch (Exception $e) {
+            $this->io->writeln($e->getMessage());
+        }
     }
 
     #[NoReturn] private function logout(): void

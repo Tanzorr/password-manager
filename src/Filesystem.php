@@ -17,9 +17,4 @@ class Filesystem
     {
         return file_exists($path);
     }
-
-    public function mkdir(string $path): bool
-    {
-        return mkdir($path);
-    }
 }

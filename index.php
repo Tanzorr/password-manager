@@ -1,5 +1,5 @@
 <?php
-global $userPassword, $passwordsFilePath, $encryptKay;
+global $passwordsFilePath;
 
 require_once __DIR__ . "/config.php";
 
@@ -19,15 +19,6 @@ $store = new Store(
         $passwordsFilePath,
         $inputOutput
     );
-
-//$auth = new Auth($userPassword, $inputOutput);
-//
-//$auth->login($inputOutput->expect("Master password: "));
-//
-//if (!$auth->isAuth()) {
-//    $inputOutput->writeln("Please login.");
-//    exit;
-//}
 
 $passwordManager = new PasswordManager($inputOutput, $store, $askHelper);
 $passwordManager->run();
