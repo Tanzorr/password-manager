@@ -1,5 +1,8 @@
 <?php
 
+namespace App;
+
+use Exception;
 use JetBrains\PhpStorm\NoReturn;
 
 class PasswordManager
@@ -42,7 +45,7 @@ class PasswordManager
     }
 
     /**
-     * @throws Exception
+     * @throws Exception;
      */
     private function getChosenAction(string $action): void
     {

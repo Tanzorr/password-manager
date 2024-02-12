@@ -1,4 +1,6 @@
 <?php
+namespace App;
+
 
 class FilesystemEncryptor implements FilesystemInterface
 {

@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 class AskHelper
 {
     private InputOutput $io;

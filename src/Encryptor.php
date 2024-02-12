@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 const ENCRYPTION_KEY = '';
 
 class Encryptor
@@ -27,10 +29,6 @@ class Encryptor
         }
 
         list($encryptedString, $iv) = explode('::', $decoded, 2);
-
-        if ($iv === false || $encryptedString === false) {
-            return false;
-        }
 
 
         $paddedIV = str_pad($iv, 16, "\0");

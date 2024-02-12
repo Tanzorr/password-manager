@@ -1,5 +1,8 @@
 <?php
 
+namespace App;
+use Exception;
+
 class Store
 {
     public function __construct(
