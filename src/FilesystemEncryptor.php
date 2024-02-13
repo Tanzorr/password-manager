@@ -4,11 +4,14 @@ namespace App;
 
 class FilesystemEncryptor implements FilesystemInterface
 {
+
+
     public function __construct(
         protected Filesystem $filesystem,
-        protected Encryptor  $encryptKay
+        protected Encryptor $encryptor
     )
     {
+
     }
 
     public function exists(string $path): bool
@@ -18,11 +21,11 @@ class FilesystemEncryptor implements FilesystemInterface
 
     public function get(string $path): string
     {
-        return $this->encryptKay->decrypt($this->filesystem->get($path));
+        return $this->encryptor->decrypt($this->filesystem->get($path));
     }
 
     public function put(string $path, string $content): int
     {
-        return $this->filesystem->put($path, $this->encryptKay->encrypt($content));
+        return $this->filesystem->put($path, $this->encryptor->encrypt($content));
     }
 }

@@ -21,6 +21,7 @@ class PasswordManager
 
     public function run(): void
     {
+
         $this->io->writeln("Welcome to Password Manager");
 
         while (true) {

@@ -1,13 +1,9 @@
 <?php
 global $passwordsFilePath;
-
-use App\AskHelper;
-use App\Encryptor;
-use App\Filesystem;
-use App\FilesystemEncryptor;
+use App\Container;
 use App\InputOutput;
 use App\PasswordManager;
-use App\Store;
+
 
 
 require_once __DIR__ . "/config.php";
@@ -21,18 +17,21 @@ spl_autoload_register(/**
     require_once __DIR__ . "/src/$className.php";
 });
 
-$inputOutput = new InputOutput();
+$io = new InputOutput();
 
-$askHelper = new AskHelper($inputOutput);
+global $encryptorName;
+$encryptorName = $io->expect("Enter your password: ");
 
-$store = new Store(
-    new FilesystemEncryptor(
-        new Filesystem(),
-        new Encryptor($inputOutput->expect("Master password >>: ")
-        )),
-    $passwordsFilePath,
-    $inputOutput
-);
+if($encryptorName === ''){
+   $io->writeln("Password is empty.");
+    exit();
+}
 
-$passwordManager = new PasswordManager($inputOutput, $store, $askHelper);
-$passwordManager->run();
+$container = new Container();
+
+try {
+    $passwordManager = $container->resolveClass(PasswordManager::class);
+    $passwordManager->run();
+} catch (ReflectionException $e) {
+    echo $e->getMessage();
+}

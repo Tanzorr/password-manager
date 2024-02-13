@@ -1,18 +1,20 @@
 <?php
 
 namespace App;
+
 use Exception;
 
 class Store
 {
+    private string $passwordsFilePath = '';
+
     public function __construct(
-        private ?FilesystemInterface $filesystem = null,
-        private readonly string      $passwordsFilePath = '',
-        private ?InputOutput         $io = null
+        private readonly ?FilesystemEncryptor  $filesystem = null,
+        private readonly ?InputOutput $io = null
     )
     {
-        $this->filesystem = $filesystem ?? new Filesystem();
-        $this->io = $io ?? new InputOutput();
+        global $passwordsFilePath;
+        $this->passwordsFilePath = $passwordsFilePath;
     }
 
     /**
@@ -64,7 +66,7 @@ class Store
     /**
      * @throws Exception
      */
-    public function getAllPasswords():array
+    public function getAllPasswords(): array
     {
         $passwords = $this->readPasswordsFile();
         if (is_array($passwords) && count($passwords) === 0) {
@@ -85,6 +87,7 @@ class Store
         }
 
         $passwords = $this->filesystem->get($this->passwordsFilePath);
+
 
         if ($passwords === '') {
             throw new Exception('Access denied');
