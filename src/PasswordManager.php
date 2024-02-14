@@ -7,21 +7,15 @@ use JetBrains\PhpStorm\NoReturn;
 
 class PasswordManager
 {
-    private InputOutput $io;
-    private Store $store;
-
-    private AskHelper $askHelper;
-
-    public function __construct(InputOutput $io, Store $store, AskHelper $askHelper)
+    public function __construct(
+        private InputOutput $io,
+        private Store       $store,
+        private AskHelper   $askHelper)
     {
-        $this->io = $io;
-        $this->store = $store;
-        $this->askHelper = $askHelper;
     }
 
     public function run(): void
     {
-
         $this->io->writeln("Welcome to Password Manager");
 
         while (true) {

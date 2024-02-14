@@ -11,6 +11,7 @@ class Encryptor
 {
 
     private string $encryptionKey = '';
+
     #[NoReturn] public function __construct()
     {
         global $encryptorName;

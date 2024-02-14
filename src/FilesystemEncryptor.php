@@ -10,9 +10,7 @@ class FilesystemEncryptor implements FilesystemInterface
         protected Filesystem $filesystem,
         protected Encryptor $encryptor
     )
-    {
-
-    }
+    {}
 
     public function exists(string $path): bool
     {
