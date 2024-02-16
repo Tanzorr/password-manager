@@ -4,8 +4,8 @@ const ENCRYPTION_KEY = '';
 
 class Encryptor
 {
-
     private string $encryptionKey = '';
+
     public function __construct(string $encryptionKey = ENCRYPTION_KEY)
     {
         $this->encryptionKey = $encryptionKey;

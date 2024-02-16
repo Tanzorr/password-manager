@@ -6,52 +6,55 @@ class PasswordManager
 {
     private InputOoutput $io;
     private Store $store;
-
     private AskHelper $askHelper;
 
-    private Auth $auth;
 
-    public function __construct(InputOoutput $io, Store $store, AskHelper $askHelper, Auth $auth)
+    public function __construct(InputOoutput $io, Store $store, AskHelper $askHelper)
     {
         $this->io = $io;
         $this->store = $store;
         $this->askHelper = $askHelper;
-        $this->auth = $auth;
     }
 
-    public function run()
+    public function run(): void
     {
-       $this->io->writeln("Welcome to Password Manager");
+        $this->io->writeln("Welcome to Password Manager");
 
-        while (true) {
-            $this->showMenu();
-            $this->getChosenAction();
+        try {
+            while (true) {
+                $this->showMenu();
+                $action = $this->io->expect("Choose action: ");
+                passthru('clear');
+                $this->getChosenAction($action);
+            }
+        } catch (Throwable $e) {
+            print "[ERROR] {$e->getMessage()}";
         }
     }
 
     private function showMenu(): void
     {
-        echo "\nMenu actions: \n";
-        echo "show. Show password\n";
-        echo "add. Add password\n";
-        echo "delete. Delete password\n";
-        echo "change. Change password\n";
-        echo "show all. Show all passwords names\n";
-        echo "q. Exit\n";
+        echo str_repeat('=', 20) . PHP_EOL;
+        echo "Menu actions: \n";
+        echo "[s] Show password\n";
+        echo "[a] Add password\n";
+        echo "[d] Delete password\n";
+        echo "[c] Change password\n";
+        echo "[l] List all passwords names\n";
+        echo "[q] Exit\n";
+        echo str_repeat('=', 20) . PHP_EOL;
     }
 
-    private function getChosenAction(): void
+    private function getChosenAction(string $action): void
     {
-        $action = $this->io->expect("Choose action: ");
-
         match ($action) {
-            "show all" => $this->store->showAllPasswords(),
-            "add" => $this->addPassword(),
-            "show" => $this->showPassword(),
-            "delete" => $this->deletePassword(),
-            "change" => $this->changePassword(),
+            "l" => $this->store->showAllPasswords(),
+            "a" => $this->addPassword(),
+            "s" => $this->showPassword(),
+            "d" => $this->deletePassword(),
+            "c" => $this->changePassword(),
             "q" => $this->logout(),
-            default => $this->io->writeln("Unknown action"),
+            default => $this->io->writeln("[ERROR] Unknown action"),
         };
     }
 
@@ -87,7 +90,7 @@ class PasswordManager
 
     #[NoReturn] private function logout(): void
     {
-        $this->auth->logout();
+//        $this->auth->logout();
         exit();
     }
 }
