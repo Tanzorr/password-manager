@@ -4,8 +4,6 @@ namespace App;
 
 class FilesystemEncryptor implements FilesystemInterface
 {
-
-
     public function __construct(
         protected Filesystem $filesystem,
         protected Encryptor $encryptor

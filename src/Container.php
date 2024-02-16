@@ -12,7 +12,6 @@ class Container
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
-        // If there is no constructor, simply instantiate the class
         if ($constructor === null) {
             return $reflection->newInstance();
         }
@@ -20,7 +19,6 @@ class Container
         $dependencies = [];
         $parameters = $constructor->getParameters();
 
-        // If the constructor has no parameters, instantiate the class
         if (empty($parameters)) {
             return $reflection->newInstance();
         }
