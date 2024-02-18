@@ -2,20 +2,12 @@
 
 namespace App;
 
-use JetBrains\PhpStorm\NoReturn;
-
-const ENCRYPTION_KEY = '';
-
-
 class Encryptor
 {
-
-    private string $encryptionKey = '';
-
-    #[NoReturn] public function __construct()
-    {
-        global $encryptorName;
-        $this->encryptionKey = $encryptorName;
+    public function __construct(
+        // мы теперь можем передававать в сервисы параметры который были настроены через setParameter
+        protected string $encryptionKey
+    ) {
     }
 
     public function encrypt(string $string): string
@@ -47,3 +39,4 @@ class Encryptor
         return $result;
     }
 }
+

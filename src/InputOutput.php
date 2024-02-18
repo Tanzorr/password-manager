@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 class InputOutput
 {
     public function writeln(string $text): void
@@ -10,7 +11,7 @@ class InputOutput
 
     public function expect(string $text): string
     {
-        echo $text . "\n";
-        return trim(readline());
+        return trim(readline("{$text} >> "));
     }
 }
+

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 
@@ -10,8 +11,8 @@ class PasswordManager
     public function __construct(
         private InputOutput $io,
         private Store       $store,
-        private AskHelper   $askHelper)
-    {
+        private AskHelper   $askHelper
+    ) {
     }
 
     public function run(): void
@@ -19,10 +20,18 @@ class PasswordManager
         $this->io->writeln("Welcome to Password Manager");
 
         while (true) {
-            $this->showMenu();
-            $action = $this->io->expect("Choose action: ");
-            passthru('clear');
-            $this->getChosenAction($action);
+            try {
+                $this->showMenu();
+                $action = $this->io->expect("Choose action: ");
+                passthru('clear');
+                $this->getChosenAction($action);
+
+            } catch(DomainException $error) {
+                // все бизнес ошибки можем ловить и продолжать работу приложения
+                $this->io->writeln("=======================");
+                $this->io->writeln("[ERROR] {$error->getMessage()}");
+                $this->io->writeln("=======================");
+            }
         }
     }
 
@@ -51,7 +60,7 @@ class PasswordManager
             "d" => $this->deletePassword(),
             "c" => $this->changePassword(),
             "q" => $this->logout(),
-            default => $this->io->writeln("[ERROR]Unknown action"),
+            default => throw new DomainException("Unsupported action"),
         };
     }
 
@@ -64,6 +73,7 @@ class PasswordManager
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->store->addPassword($passwordName, $passwordValue);
+        $this->io->writeln("$passwordName Password added.");
     }
 
     /**
@@ -74,7 +84,7 @@ class PasswordManager
         $passwordName = $this->askHelper->askPasswordName();
         $passwordValue = $this->store->getPassword($passwordName);
 
-        $this->io->writeln($passwordValue);
+        $this->io->writeln("[$passwordName] >> \"$passwordValue\"");
     }
 
     /**
@@ -84,6 +94,8 @@ class PasswordManager
     {
         $passwordName = $this->askHelper->askPasswordName();
         $this->store->deletePassword($passwordName);
+
+        $this->io->writeln("Password '{$passwordName}' was deleted.");
     }
 
     /**
@@ -95,21 +107,20 @@ class PasswordManager
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->store->changePassword($passwordName, $passwordValue);
+        $this->io->writeln("Password $passwordName changed.");
     }
 
     private function showAllPasswords(): void
     {
-        try {
-            $passwords = $this->store->getAllPasswords();
-            $this->io->writeln("===============");
-            foreach ($passwords as $key => $value) {
-                $this->io->writeln("Password name: " . $key);
-            }
-            $this->io->writeln("===============");
-
-        } catch (Exception $e) {
-            $this->io->writeln($e->getMessage());
+        $passwords = $this->store->getAllPasswords();
+        $this->io->writeln("===============");
+        if(count($passwords) === 0) {
+            $this->io->writeln("<< Nothing to diplay >>");
         }
+        foreach ($passwords as $key => $value) {
+            $this->io->writeln("Password name: " . $key);
+        }
+        $this->io->writeln("===============");
     }
 
     #[NoReturn] private function logout(): void

@@ -2,30 +2,28 @@
 
 namespace App;
 
+use DomainException;
 use Exception;
 
 class Store
 {
-    private string $passwordsFilePath = '';
-
     public function __construct(
-        private readonly ?FilesystemEncryptor  $filesystem = null,
-        private readonly ?InputOutput $io = null
-    )
-    {
-        global $passwordsFilePath;
-        $this->passwordsFilePath = $passwordsFilePath;
+        // этот класс должен работать только с файлом, соответственно он не должен выводить никакого текста на экран, именно поэтому мы и убрали IO
+        private readonly FilesystemEncryptor  $filesystem,
+        protected string $storagePath
+    ) {
     }
 
     /**
      * @throws Exception
      */
-    public function addPassword(string $passwordName, string $passwordValue): void
+    public function addPassword(string $passwordName, string $passwordValue): bool
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
-        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
-        $this->io->writeln("$passwordName Password added.");
+        $this->filesystem->put($this->storagePath, json_encode($passwords));
+
+        return true;
     }
 
     /**
@@ -34,17 +32,13 @@ class Store
     public function getPassword(string $passwordName): string
     {
         $passwords = $this->readPasswordsFile();
-        if (!array_key_exists($passwordName, $passwords)) {
-            return "Password not found.";
-        }
-
         $decryptPassword = $passwords[$passwordName];
 
-        if ($decryptPassword) {
-            return $decryptPassword;
-        } else {
-            return 'Password not found.';
+        if (!$decryptPassword) {
+            throw new DomainException("Password was not found.");
         }
+
+        return $decryptPassword;
     }
 
     /**
@@ -55,12 +49,11 @@ class Store
         $passwords = $this->readPasswordsFile();
 
         if (!array_key_exists($passwordName, $passwords)) {
-            $this->io->writeln("Password not found.");
-            return;
+            throw new DomainException("Password was not found.");
         }
 
         unset($passwords[$passwordName]);
-        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
+        $this->filesystem->put($this->storagePath, json_encode($passwords));
     }
 
     /**
@@ -68,29 +61,25 @@ class Store
      */
     public function getAllPasswords(): array
     {
-        $passwords = $this->readPasswordsFile();
-        if (is_array($passwords) && count($passwords) === 0) {
-            throw new Exception('No passwords found');
-        }
-
-        return $passwords;
+        // если нам нечего показывать, то это не ошибка, просто список будет пустым
+        return $this->readPasswordsFile();
     }
 
     /**
      * @throws Exception
      */
-    private function readPasswordsFile(): string|array
+    private function readPasswordsFile(): array
     {
-        if (!$this->filesystem->exists($this->passwordsFilePath)) {
-            $this->filesystem->put($this->passwordsFilePath, json_encode([]));
-            throw new Exception("No passwords found.");
+        if (!$this->filesystem->exists($this->storagePath)) {
+            $this->filesystem->put($this->storagePath, json_encode([]));
+            return []; // в случае если это первый пароль оно не должно ещё отваливаться
         }
 
-        $passwords = $this->filesystem->get($this->passwordsFilePath);
+        $passwords = $this->filesystem->get($this->storagePath);
 
 
         if ($passwords === '') {
-            throw new Exception('Access denied');
+            throw new DomainException('Access denied');
         }
 
         return json_decode($passwords, true);
@@ -105,8 +94,7 @@ class Store
 
         if ($this->isPasswordExist($passwordName)) {
             $passwords[$passwordName] = $newPasswordValue;
-            $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
-            $this->io->writeln("Password $passwordName changed.");
+            $this->filesystem->put($this->storagePath, json_encode($passwords));
         }
     }
 
@@ -117,7 +105,7 @@ class Store
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
-            throw new Exception("Password not found.");
+            throw new DomainException("Password not found.");
         }
 
         return true;
