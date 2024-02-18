@@ -2,7 +2,7 @@
 
 namespace App;
 
- class AskHelper
+class AskHelper
 {
     public function __construct(private InputOutput $io)
     {
@@ -29,3 +29,4 @@ namespace App;
         return $fieldVal;
     }
 }
+
