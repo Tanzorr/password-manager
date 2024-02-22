@@ -1,15 +1,14 @@
 <?php
 
-class AskHelper
-{
-    private InputOoutput $io;
+namespace App;
 
-    public function __construct(InputOoutput $io = null)
+ class AskHelper
+{
+    public function __construct(private InputOutput $io)
     {
-        $this->io = $io ?? new InputOoutput();
     }
 
-   public function askPasswordName(): string
+    public function askPasswordName(): string
     {
         return $this->askField('password name');
     }
@@ -23,7 +22,7 @@ class AskHelper
     {
         $fieldVal = $this->io->expect("Enter $fieldName: ");
 
-        if($fieldVal === ''){
+        if ($fieldVal === '') {
             echo "Field $fieldName is empty.\n";
             return $this->askField($fieldName);
         }

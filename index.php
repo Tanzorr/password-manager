@@ -1,31 +1,35 @@
 <?php
-global $userPassword, $passwordsFilePath, $encryptKay;
+global $passwordsFilePath;
+use App\Container;
+use App\InputOutput;
+use App\PasswordManager;
 
 require_once __DIR__ . "/config.php";
 
-spl_autoload_register(function ($className) {
+spl_autoload_register(/**
+ * @throws Exception
+ */ callback: function ($className) {
+    $className = str_replace("\\", "/", $className);
+    $className = str_replace("App/", "", $className);
+
     require_once __DIR__ . "/src/$className.php";
 });
 
-$inputOutput = new InputOoutput();
+$io = new InputOutput();
 
-$askHelper = new AskHelper($inputOutput);
+global $encryptorName;
+$encryptorName = $io->expect("Enter your password: ");
 
-$store =  new Store(
-    new Filesystem(),
-    new Encryptor($encryptKay),
-    $passwordsFilePath,
-    $inputOutput
-);
-
-$auth = new Auth($userPassword, $inputOutput);
-
-$auth->login($inputOutput->expect("Master password: "));
-
-if(!$auth->isAuth()){
-    $inputOutput->writeln("Please login.");
-    exit;
+if($encryptorName === ''){
+   $io->writeln("Password is empty.");
+    exit();
 }
 
-$passwordManager = new PasswordManager($inputOutput, $store, $askHelper, $auth);
-$passwordManager->run();
+$container = new Container();
+
+try {
+    $passwordManager = $container->resolveClass(PasswordManager::class);
+    $passwordManager->run();
+} catch (ReflectionException $e) {
+    echo $e->getMessage();
+}

@@ -1,14 +1,21 @@
 <?php
 
+namespace App;
+
+use JetBrains\PhpStorm\NoReturn;
+
 const ENCRYPTION_KEY = '';
+
 
 class Encryptor
 {
 
     private string $encryptionKey = '';
-    public function __construct(string $encryptionKey = ENCRYPTION_KEY)
+
+    #[NoReturn] public function __construct()
     {
-        $this->encryptionKey = $encryptionKey;
+        global $encryptorName;
+        $this->encryptionKey = $encryptorName;
     }
 
     public function encrypt(string $string): string
@@ -27,10 +34,6 @@ class Encryptor
         }
 
         list($encryptedString, $iv) = explode('::', $decoded, 2);
-
-        if ($iv === false || $encryptedString === false) {
-            return false;
-        }
 
 
         $paddedIV = str_pad($iv, 16, "\0");

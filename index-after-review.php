@@ -41,7 +41,7 @@ InputOoutput:
 */
 
 // результирующай код будет выглядеть примерно так
-$io = new InputOoutput();
+$io = new InputOutput();
 $masterPass = $io->expect("Master password");
 
 $store = new Store(

@@ -1,35 +1,36 @@
 <?php
 
+namespace App;
+
+use Exception;
+
 class Store
 {
     private string $passwordsFilePath = '';
-    private Filesystem $filesystem;
-    private Encryptor $encryptor;
-
-    private InputOoutput $io;
 
     public function __construct(
-        Filesystem   $filesystem = null,
-        Encryptor    $encryptor = null,
-        string       $passToFile = '',
-
-        InputOoutput $io = null
+        private readonly ?FilesystemEncryptor  $filesystem = null,
+        private readonly ?InputOutput $io = null
     )
     {
-        $this->passwordsFilePath = $passToFile;
-        $this->filesystem = $filesystem ?? new Filesystem();
-        $this->encryptor = $encryptor ?? new Encryptor();
-        $this->io = $io ?? new InputOoutput();
+        global $passwordsFilePath;
+        $this->passwordsFilePath = $passwordsFilePath;
     }
 
+    /**
+     * @throws Exception
+     */
     public function addPassword(string $passwordName, string $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
-        $passwords[$passwordName] = $this->encryptor->encrypt($passwordValue);
+        $passwords[$passwordName] = $passwordValue;
         $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
         $this->io->writeln("$passwordName Password added.");
     }
 
+    /**
+     * @throws Exception
+     */
     public function getPassword(string $passwordName): string
     {
         $passwords = $this->readPasswordsFile();
@@ -37,7 +38,7 @@ class Store
             return "Password not found.";
         }
 
-        $decryptPassword = $this->encryptor->decrypt($passwords[$passwordName]);
+        $decryptPassword = $passwords[$passwordName];
 
         if ($decryptPassword) {
             return $decryptPassword;
@@ -46,6 +47,9 @@ class Store
         }
     }
 
+    /**
+     * @throws Exception
+     */
     public function deletePassword(string $passwordName): void
     {
         $passwords = $this->readPasswordsFile();
@@ -59,52 +63,61 @@ class Store
         $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
     }
 
-    public function showAllPasswords(): void
+    /**
+     * @throws Exception
+     */
+    public function getAllPasswords(): array
     {
         $passwords = $this->readPasswordsFile();
         if (is_array($passwords) && count($passwords) === 0) {
-            $this->io->writeln("No passwords found.");
-            return;
+            throw new Exception('No passwords found');
         }
 
-        foreach ($passwords as $key => $value) {
-            $this->io->writeln("Password name: " . $key);
-        }
+        return $passwords;
     }
 
+    /**
+     * @throws Exception
+     */
     private function readPasswordsFile(): string|array
     {
         if (!$this->filesystem->exists($this->passwordsFilePath)) {
-            $this->io->writeln("No passwords found.");
+            $this->filesystem->put($this->passwordsFilePath, json_encode([]));
+            throw new Exception("No passwords found.");
         }
 
         $passwords = $this->filesystem->get($this->passwordsFilePath);
 
-        if ($passwords === false || $passwords === '') {
-            return [];
+
+        if ($passwords === '') {
+            throw new Exception('Access denied');
         }
 
         return json_decode($passwords, true);
     }
 
+    /**
+     * @throws Exception
+     */
     public function changePassword(string $passwordName, string $newPasswordValue): void
     {
         $passwords = $this->readPasswordsFile();
-        $encryptNewPasswordValue = $this->encryptor->encrypt($newPasswordValue);
 
         if ($this->isPasswordExist($passwordName)) {
-            $passwords[$passwordName] = $encryptNewPasswordValue;
+            $passwords[$passwordName] = $newPasswordValue;
             $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
             $this->io->writeln("Password $passwordName changed.");
         }
     }
 
+    /**
+     * @throws Exception
+     */
     private function isPasswordExist(string $passwordName): bool
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
-            $this->io->writeln("Password not found.");
-            return false;
+            throw new Exception("Password not found.");
         }
 
         return true;
