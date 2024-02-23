@@ -9,8 +9,8 @@ class Store
     private string $passwordsFilePath = '';
 
     public function __construct(
-        private readonly ?FilesystemEncryptor  $filesystem = null,
-        private readonly ?InputOutput $io = null
+        private  ?FilesystemEncryptor  $filesystem = null,
+        private  ?InputOutput $io = null
     )
     {
         global $passwordsFilePath;

@@ -4,6 +4,14 @@ namespace App;
 
 class Container
 {
+
+    public function load(string $serviceFilesPath): void
+    {
+        $services = require $serviceFilesPath;
+        foreach ($services as $service) {
+            $this->register($service);
+        }
+    }
     /**
      * @throws \ReflectionException
      */

@@ -1,19 +1,16 @@
 <?php
-global $passwordsFilePath;
-use App\Container;
+namespace App;
+
+
 use App\InputOutput;
 use App\PasswordManager;
+use ReflectionException;
+use App\FilesystemEncryptor;
 
 require_once __DIR__ . "/config.php";
+require_once __DIR__ . "/vendor/autoload.php";
+global $passwordsFilePath;
 
-spl_autoload_register(/**
- * @throws Exception
- */ callback: function ($className) {
-    $className = str_replace("\\", "/", $className);
-    $className = str_replace("App/", "", $className);
-
-    require_once __DIR__ . "/src/$className.php";
-});
 
 $io = new InputOutput();
 
