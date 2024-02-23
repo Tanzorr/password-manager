@@ -25,7 +25,7 @@ if($encryptorName === ''){
 $container = new Container();
 
 try {
-    $passwordManager = $container->resolveClass(PasswordManager::class);
+    $passwordManager = $container->build(PasswordManager::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
     echo $e->getMessage();
