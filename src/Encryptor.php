@@ -9,14 +9,8 @@ const ENCRYPTION_KEY = '';
 
 class Encryptor
 {
-
-    private string $encryptionKey = '';
-
-    #[NoReturn] public function __construct()
-    {
-        global $encryptorName;
-        $this->encryptionKey = $encryptorName;
-    }
+    #[NoReturn] public function __construct( private string $encryptionKey = '')
+    {}
 
     public function encrypt(string $string): string
     {

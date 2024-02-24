@@ -2,6 +2,8 @@
 
 namespace App;
 
+
+use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 
@@ -19,10 +21,16 @@ class PasswordManager
         $this->io->writeln("Welcome to Password Manager");
 
         while (true) {
-            $this->showMenu();
-            $action = $this->io->expect("Choose action: ");
-            passthru('clear');
-            $this->getChosenAction($action);
+            try {
+                $this->showMenu();
+                $action = $this->io->expect("Choose action: ");
+                passthru('clear');
+                $this->getChosenAction($action);
+            } catch (DomainException $error) {
+                $this->io->writeln("====================");
+                $this->io->writeln("[ERROR]{$error->getMessage()}");
+                $this->io->writeln("====================");
+            }
         }
     }
 
@@ -84,6 +92,8 @@ class PasswordManager
     {
         $passwordName = $this->askHelper->askPasswordName();
         $this->store->deletePassword($passwordName);
+
+        $this->io->writeln("$passwordName Password deleted.");
     }
 
     /**
@@ -95,21 +105,24 @@ class PasswordManager
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->store->changePassword($passwordName, $passwordValue);
+        $this->io->writeln("$passwordName Password changed.");
     }
 
+    /**
+     * @throws Exception
+     */
     private function showAllPasswords(): void
     {
-        try {
             $passwords = $this->store->getAllPasswords();
             $this->io->writeln("===============");
+            if(count($passwords) === 0){
+                $this->io->writeln("<< No passwords found >>");
+            }
             foreach ($passwords as $key => $value) {
                 $this->io->writeln("Password name: " . $key);
             }
             $this->io->writeln("===============");
 
-        } catch (Exception $e) {
-            $this->io->writeln($e->getMessage());
-        }
     }
 
     #[NoReturn] private function logout(): void

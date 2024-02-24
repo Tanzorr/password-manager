@@ -36,8 +36,8 @@ class Container
         }
 
         foreach ($parameters as $parameter) {
-            if($parameter->getType()->isBuiltin()){
-                if(!isset($this->parameters[$parameter->getName()])){
+            if ($parameter->getType()->isBuiltin()) {
+                if (!isset($this->parameters[$parameter->getName()])) {
                     throw new LogicException("No value found for parameter {$parameter->getName()}");
                 }
                 $dependencies[] = $this->parameters[$parameter->getName()];
@@ -58,10 +58,28 @@ class Container
 
         return $reflection->newInstanceArgs($dependencies);
     }
-    
+
     public function setParameter(string $key, string|int|array $value): void
     {
         $this->parameters[$key] = $value;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function get(string $key): mixed
+    {
+        if (class_exists($key)) {
+            $this->cache[$key] ??= $this->build($key);
+
+            return $this->cache[$key];
+        }
+
+        if($this->parameters[$key]){
+            return $this->parameters[$key];
+        }
+
+        throw new LogicException("No value found for parameter {$key}");
     }
 
     public function load(string $serviceFilesPath): void

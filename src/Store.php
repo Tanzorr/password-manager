@@ -4,28 +4,25 @@ namespace App;
 
 use Exception;
 
-class Store
+class Store implements RepositoryInterface
 {
-    private string $passwordsFilePath = '';
-
     public function __construct(
-        private  ?FilesystemEncryptor  $filesystem = null,
-        private  ?InputOutput $io = null
+        private readonly ?FilesystemEncryptor $filesystem = null,
+        private string                        $storagePath = '',
     )
     {
-        global $passwordsFilePath;
-        $this->passwordsFilePath = $passwordsFilePath;
     }
 
     /**
      * @throws Exception
      */
-    public function addPassword(string $passwordName, string $passwordValue): void
+    public function addPassword(string $passwordName, string $passwordValue): bool
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
-        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
-        $this->io->writeln("$passwordName Password added.");
+        $this->filesystem->put($this->storagePath, json_encode($passwords));
+
+        return true;
     }
 
     /**
@@ -60,7 +57,7 @@ class Store
         }
 
         unset($passwords[$passwordName]);
-        $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
+        $this->filesystem->put($this->storagePath, json_encode($passwords));
     }
 
     /**
@@ -68,26 +65,20 @@ class Store
      */
     public function getAllPasswords(): array
     {
-        $passwords = $this->readPasswordsFile();
-        if (is_array($passwords) && count($passwords) === 0) {
-            throw new Exception('No passwords found');
-        }
-
-        return $passwords;
+        return $this->readPasswordsFile();
     }
 
     /**
      * @throws Exception
      */
-    private function readPasswordsFile(): string|array
+    private function readPasswordsFile(): array
     {
-        if (!$this->filesystem->exists($this->passwordsFilePath)) {
-            $this->filesystem->put($this->passwordsFilePath, json_encode([]));
-            throw new Exception("No passwords found.");
+        if (!$this->filesystem->exists($this->storagePath)) {
+            $this->filesystem->put($this->storagePath, json_encode([]));
+            return [];
         }
 
-        $passwords = $this->filesystem->get($this->passwordsFilePath);
-
+        $passwords = $this->filesystem->get($this->storagePath);
 
         if ($passwords === '') {
             throw new Exception('Access denied');
@@ -105,8 +96,7 @@ class Store
 
         if ($this->isPasswordExist($passwordName)) {
             $passwords[$passwordName] = $newPasswordValue;
-            $this->filesystem->put($this->passwordsFilePath, json_encode($passwords));
-            $this->io->writeln("Password $passwordName changed.");
+            $this->filesystem->put($this->storagePath, json_encode($passwords));
         }
     }
 
@@ -121,5 +111,41 @@ class Store
         }
 
         return true;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function create(array $attributes): object
+    {
+        $passwords = $this->readPasswordsFile();
+
+        if (!$this->isPasswordExist($attributes['name'])) {
+            $passwords[$attributes['name']] = $attributes['value'];
+            $this->filesystem->put($this->storagePath, json_encode($passwords));
+        } else {
+            throw new Exception("Password already exists.");
+        }
+        return $this;
+    }
+
+    public function update(int|string $id): bool
+    {
+        // TODO: Implement update() method.
+    }
+
+    public function delete(int|string $id): bool
+    {
+        // TODO: Implement delete() method.
+    }
+
+    public function find(int|string $id): ?object
+    {
+        // TODO: Implement find() method.
+    }
+
+    public function all(): array
+    {
+        // TODO: Implement all() method.
     }
 }
