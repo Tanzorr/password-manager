@@ -7,8 +7,8 @@ use Exception;
 class Store implements RepositoryInterface
 {
     public function __construct(
-        private readonly ?FilesystemEncryptor $filesystem = null,
-        private string                        $storagePath = '',
+        private  FilesystemEncryptor $filesystemEncryptor,
+        private  string              $storagePath = '',
     )
     {
     }
@@ -20,7 +20,7 @@ class Store implements RepositoryInterface
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
-        $this->filesystem->put($this->storagePath, json_encode($passwords));
+        $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
 
         return true;
     }
@@ -49,15 +49,13 @@ class Store implements RepositoryInterface
      */
     public function deletePassword(string $passwordName): void
     {
-        $passwords = $this->readPasswordsFile();
-
-        if (!array_key_exists($passwordName, $passwords)) {
-            $this->io->writeln("Password not found.");
-            return;
+        if (!$this->isPasswordExist($passwordName)) {
+            $passwords = $this->readPasswordsFile();
+            unset($passwords[$passwordName]);
+            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
+        } else {
+            throw new Exception("Password not found.");
         }
-
-        unset($passwords[$passwordName]);
-        $this->filesystem->put($this->storagePath, json_encode($passwords));
     }
 
     /**
@@ -73,12 +71,12 @@ class Store implements RepositoryInterface
      */
     private function readPasswordsFile(): array
     {
-        if (!$this->filesystem->exists($this->storagePath)) {
-            $this->filesystem->put($this->storagePath, json_encode([]));
+        if (!$this->filesystemEncryptor->exists($this->storagePath)) {
+            $this->filesystemEncryptor->put($this->storagePath, json_encode([]));
             return [];
         }
 
-        $passwords = $this->filesystem->get($this->storagePath);
+        $passwords = $this->filesystemEncryptor->get($this->storagePath);
 
         if ($passwords === '') {
             throw new Exception('Access denied');
@@ -96,7 +94,7 @@ class Store implements RepositoryInterface
 
         if ($this->isPasswordExist($passwordName)) {
             $passwords[$passwordName] = $newPasswordValue;
-            $this->filesystem->put($this->storagePath, json_encode($passwords));
+            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
         }
     }
 
@@ -118,15 +116,12 @@ class Store implements RepositoryInterface
      */
     public function create(array $attributes): object
     {
-        $passwords = $this->readPasswordsFile();
-
         if (!$this->isPasswordExist($attributes['name'])) {
-            $passwords[$attributes['name']] = $attributes['value'];
-            $this->filesystem->put($this->storagePath, json_encode($passwords));
+            $password = new Password($attributes);
         } else {
             throw new Exception("Password already exists.");
         }
-        return $this;
+        return $password;
     }
 
     public function update(int|string $id): bool
@@ -134,18 +129,31 @@ class Store implements RepositoryInterface
         // TODO: Implement update() method.
     }
 
+    /**
+     * @throws Exception
+     */
     public function delete(int|string $id): bool
     {
-        // TODO: Implement delete() method.
+        if ($this->isPasswordExist($id)) {
+            $this->deletePassword($id);
+            return true;
+        }
+        return false;
     }
 
+    /**
+     * @throws Exception
+     */
     public function find(int|string $id): ?object
     {
-        // TODO: Implement find() method.
+        return $this->readPasswordsFile()[$id];
     }
 
+    /**
+     * @throws Exception
+     */
     public function all(): array
     {
-        // TODO: Implement all() method.
+        return $this->readPasswordsFile();
     }
 }

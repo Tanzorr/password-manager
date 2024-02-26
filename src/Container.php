@@ -5,15 +5,26 @@ namespace App;
 use LogicException;
 use ReflectionException;
 
+use Symfony\Component\Config\FileLocator;
+use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+
+
 class Container
 {
     /**
      * @var array<string, object|int|array>
      */
+    private SymfonyContainerBuilder $container;
 
     private array $parameters = [];
 
     private array $cache = [];
+
+    public function __construct()
+    {
+        $this->container = new SymfonyContainerBuilder();
+    }
 
 
     /**
@@ -82,8 +93,17 @@ class Container
         throw new LogicException("No value found for parameter {$key}");
     }
 
+    /**
+     * @throws \Exception
+     */
     public function load(string $serviceFilesPath): void
     {
+        $fileLocator = new FileLocator(dirname($serviceFilesPath));
+        $loader = new YamlFileLoader($this->container, $fileLocator);
+        $loader->load(basename($serviceFilesPath));
 
+        $storagePath = $this->container->getParameter('storagePath');
+
+        $this->setParameter('storagePath', $storagePath);
     }
 }

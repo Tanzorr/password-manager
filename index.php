@@ -2,16 +2,21 @@
 namespace App;
 
 
+global $io;
+
 use ReflectionException;
 
 require_once __DIR__ . "/config.php";
 require_once __DIR__ . "/vendor/autoload.php";
-global $storagePath;
 
 
 $container = new Container();
 
-$io = $container->get(InputOutput::class);
+try {
+    $io = $container->get(InputOutput::class);
+} catch (ReflectionException $e) {
+    $io->writeln($e->getMessage());
+}
 
 $encryptionKey = $io->expect("Enter encryption name: ");
 
@@ -21,12 +26,11 @@ if($encryptionKey === ''){
 }
 
 $container->setParameter('encryptionKey', $encryptionKey);
-$container->setParameter('storagePath', './passwords.json');
-
+$container->load('./service.yaml');
 
 try {
     $passwordManager = $container->build(PasswordManager::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
-    echo $e->getMessage();
+    $io->writeln($e->getMessage());
 }
