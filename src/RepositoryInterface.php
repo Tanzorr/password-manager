@@ -7,7 +7,7 @@ interface RepositoryInterface
 {
     public function create(array $attributes): object;
 
-    public function update(int|string $id): bool;
+    public function update(array $attributes): bool;
 
     public function delete(int|string $id): bool;
 

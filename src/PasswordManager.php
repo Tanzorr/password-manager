@@ -68,6 +68,7 @@ class PasswordManager
      */
     private function addPassword(): void
     {
+        $attributes = [];
         $passwordName = $this->askHelper->askPasswordName();
         $passwordValue = $this->askHelper->askPasswordValue();
 
@@ -80,9 +81,9 @@ class PasswordManager
     private function showPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        $passwordValue = $this->store->getPassword($passwordName);
+        $password = $this->store->find($passwordName);
 
-        $this->io->writeln($passwordValue);
+        $this->io->writeln($password->getValue());
     }
 
     /**
@@ -91,9 +92,9 @@ class PasswordManager
     private function deletePassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        $this->store->deletePassword($passwordName);
-
-        $this->io->writeln("$passwordName Password deleted.");
+        if($this->store->delete($passwordName)){
+            $this->io->writeln("$passwordName Password deleted.");
+        }
     }
 
     /**
@@ -101,11 +102,12 @@ class PasswordManager
      */
     private function changePassword(): void
     {
-        $passwordName = $this->askHelper->askPasswordName();
-        $passwordValue = $this->askHelper->askPasswordValue();
+        $attributes = [];
+        $attributes['name'] = $this->askHelper->askPasswordName();
+        $attributes['value']= $this->askHelper->askPasswordValue();
 
-        $this->store->changePassword($passwordName, $passwordValue);
-        $this->io->writeln("$passwordName Password changed.");
+        $this->store->update($attributes);
+        $this->io->writeln($attributes['name']. "Password changed.");
     }
 
     /**
@@ -113,7 +115,7 @@ class PasswordManager
      */
     private function showAllPasswords(): void
     {
-            $passwords = $this->store->getAllPasswords();
+            $passwords = $this->store->all();
             $this->io->writeln("===============");
             if(count($passwords) === 0){
                 $this->io->writeln("<< No passwords found >>");

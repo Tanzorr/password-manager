@@ -16,59 +16,6 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function addPassword(string $passwordName, string $passwordValue): bool
-    {
-        $passwords = $this->readPasswordsFile();
-        $passwords[$passwordName] = $passwordValue;
-        $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
-
-        return true;
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getPassword(string $passwordName): string
-    {
-        $passwords = $this->readPasswordsFile();
-        if (!array_key_exists($passwordName, $passwords)) {
-            return "Password not found.";
-        }
-
-        $decryptPassword = $passwords[$passwordName];
-
-        if ($decryptPassword) {
-            return $decryptPassword;
-        } else {
-            return 'Password not found.';
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function deletePassword(string $passwordName): void
-    {
-        if (!$this->isPasswordExist($passwordName)) {
-            $passwords = $this->readPasswordsFile();
-            unset($passwords[$passwordName]);
-            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
-        } else {
-            throw new Exception("Password not found.");
-        }
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function getAllPasswords(): array
-    {
-        return $this->readPasswordsFile();
-    }
-
-    /**
-     * @throws Exception
-     */
     private function readPasswordsFile(): array
     {
         if (!$this->filesystemEncryptor->exists($this->storagePath)) {
@@ -85,18 +32,6 @@ class Store implements RepositoryInterface
         return json_decode($passwords, true);
     }
 
-    /**
-     * @throws Exception
-     */
-    public function changePassword(string $passwordName, string $newPasswordValue): void
-    {
-        $passwords = $this->readPasswordsFile();
-
-        if ($this->isPasswordExist($passwordName)) {
-            $passwords[$passwordName] = $newPasswordValue;
-            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
-        }
-    }
 
     /**
      * @throws Exception
@@ -105,7 +40,7 @@ class Store implements RepositoryInterface
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
-            throw new Exception("Password not found.");
+            return false;
         }
 
         return true;
@@ -124,9 +59,31 @@ class Store implements RepositoryInterface
         return $password;
     }
 
-    public function update(int|string $id): bool
+    /**
+     * @throws Exception
+     */
+    public function addPassword(string $passwordName, string $passwordValue): void
     {
-        // TODO: Implement update() method.
+        $passwords = $this->readPasswordsFile();
+        $passwords[$passwordName] = $passwordValue;
+        $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function update(array $attributes): bool
+    {
+        $passwords = $this->readPasswordsFile();
+
+        if ($this->isPasswordExist($attributes['name'])) {
+            $passwords[$attributes['name']] = $attributes['value'];
+            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -135,9 +92,13 @@ class Store implements RepositoryInterface
     public function delete(int|string $id): bool
     {
         if ($this->isPasswordExist($id)) {
-            $this->deletePassword($id);
+            $passwords = $this->readPasswordsFile();
+            unset($passwords[$id]);
+            $this->filesystemEncryptor->put($this->storagePath, json_encode($passwords));
+
             return true;
         }
+
         return false;
     }
 
@@ -146,7 +107,12 @@ class Store implements RepositoryInterface
      */
     public function find(int|string $id): ?object
     {
-        return $this->readPasswordsFile()[$id];
+        $password = $this->readPasswordsFile()[$id];
+
+        if($password){
+            return new Password(['name' => $id, 'value' => $password]);
+        }
+        return null;
     }
 
     /**

@@ -9,4 +9,9 @@ class Password
     public function __construct(array $attributes) {
         $this->attributes = $attributes;
     }
+
+    public function getValue(): string
+    {
+        return $this->attributes['value'];
+    }
 }

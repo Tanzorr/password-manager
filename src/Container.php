@@ -101,7 +101,6 @@ class Container
         $fileLocator = new FileLocator(dirname($serviceFilesPath));
         $loader = new YamlFileLoader($this->container, $fileLocator);
         $loader->load(basename($serviceFilesPath));
-
         $storagePath = $this->container->getParameter('storagePath');
 
         $this->setParameter('storagePath', $storagePath);
