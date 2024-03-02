@@ -1,4 +1,5 @@
 <?php
+
 namespace App;
 
 
@@ -6,9 +7,10 @@ class FilesystemEncryptor implements FilesystemInterface
 {
     public function __construct(
         protected Filesystem $filesystem,
-        protected Encryptor $encryptor
+        protected Encryptor  $encryptor
     )
-    {}
+    {
+    }
 
     public function exists(string $path): bool
     {

@@ -4,13 +4,13 @@ namespace App;
 
 use JetBrains\PhpStorm\NoReturn;
 
-const ENCRYPTION_KEY = '';
 
 
 class Encryptor
 {
-    #[NoReturn] public function __construct( private string $encryptionKey = '')
-    {}
+    #[NoReturn] public function __construct(private string $encryptionKey = '')
+    {
+    }
 
     public function encrypt(string $string): string
     {

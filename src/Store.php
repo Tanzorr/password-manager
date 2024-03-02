@@ -7,8 +7,8 @@ use Exception;
 class Store implements RepositoryInterface
 {
     public function __construct(
-        private  FilesystemEncryptor $filesystemEncryptor,
-        private  string              $storagePath = '',
+        private FilesystemEncryptor $filesystemEncryptor,
+        private string              $storagePath = '',
     )
     {
     }
@@ -53,6 +53,7 @@ class Store implements RepositoryInterface
     {
         if (!$this->isPasswordExist($attributes['name'])) {
             $password = new Password($attributes);
+            $this->addPassword($attributes['name'], $attributes['value']);
         } else {
             throw new Exception("Password already exists.");
         }
@@ -109,7 +110,7 @@ class Store implements RepositoryInterface
     {
         $password = $this->readPasswordsFile()[$id];
 
-        if($password){
+        if ($password) {
             return new Password(['name' => $id, 'value' => $password]);
         }
         return null;
@@ -118,7 +119,7 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function all(): array
+    public function findAll(): array
     {
         return $this->readPasswordsFile();
     }

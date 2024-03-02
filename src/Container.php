@@ -86,7 +86,7 @@ class Container
             return $this->cache[$key];
         }
 
-        if($this->parameters[$key]){
+        if ($this->parameters[$key]) {
             return $this->parameters[$key];
         }
 

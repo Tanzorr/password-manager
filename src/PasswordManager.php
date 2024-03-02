@@ -69,10 +69,11 @@ class PasswordManager
     private function addPassword(): void
     {
         $attributes = [];
-        $passwordName = $this->askHelper->askPasswordName();
-        $passwordValue = $this->askHelper->askPasswordValue();
 
-        $this->store->addPassword($passwordName, $passwordValue);
+        $attributes['name'] = $this->askHelper->askPasswordName();
+        $attributes['value'] = $this->askHelper->askPasswordValue();
+
+        $this->store->create($attributes);
     }
 
     /**
@@ -92,7 +93,7 @@ class PasswordManager
     private function deletePassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        if($this->store->delete($passwordName)){
+        if ($this->store->delete($passwordName)) {
             $this->io->writeln("$passwordName Password deleted.");
         }
     }
@@ -104,10 +105,10 @@ class PasswordManager
     {
         $attributes = [];
         $attributes['name'] = $this->askHelper->askPasswordName();
-        $attributes['value']= $this->askHelper->askPasswordValue();
+        $attributes['value'] = $this->askHelper->askPasswordValue();
 
         $this->store->update($attributes);
-        $this->io->writeln($attributes['name']. "Password changed.");
+        $this->io->writeln($attributes['name'] . "Password changed.");
     }
 
     /**
@@ -115,15 +116,15 @@ class PasswordManager
      */
     private function showAllPasswords(): void
     {
-            $passwords = $this->store->all();
-            $this->io->writeln("===============");
-            if(count($passwords) === 0){
-                $this->io->writeln("<< No passwords found >>");
-            }
-            foreach ($passwords as $key => $value) {
-                $this->io->writeln("Password name: " . $key);
-            }
-            $this->io->writeln("===============");
+        $passwords = $this->store->findAll();
+        $this->io->writeln("===============");
+        if (count($passwords) === 0) {
+            $this->io->writeln("<< No passwords found >>");
+        }
+        foreach ($passwords as $key => $value) {
+            $this->io->writeln("Password name: " . $key);
+        }
+        $this->io->writeln("===============");
 
     }
 

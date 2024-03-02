@@ -13,5 +13,5 @@ interface RepositoryInterface
 
     public function find(int|string $id): ?object;
 
-    public function all(): array;
+    public function findAll(): array;
 }
