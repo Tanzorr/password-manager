@@ -6,8 +6,7 @@ use LogicException;
 use ReflectionException;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerBuilder as SymfonyContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Symfony\Component\Yaml\Yaml;
 
 
 class Container
@@ -15,7 +14,6 @@ class Container
     /**
      * @var array<string, object|int|array>
      */
-    private SymfonyContainerBuilder $container;
 
     private array $parameters = [];
 
@@ -23,7 +21,7 @@ class Container
 
     public function __construct()
     {
-        $this->container = new SymfonyContainerBuilder();
+
     }
 
 
@@ -99,10 +97,15 @@ class Container
     public function load(string $serviceFilesPath): void
     {
         $fileLocator = new FileLocator(dirname($serviceFilesPath));
-        $loader = new YamlFileLoader($this->container, $fileLocator);
-        $loader->load(basename($serviceFilesPath));
-        $storagePath = $this->container->getParameter('storagePath');
+        $serviceYaml = Yaml::parseFile($fileLocator->locate($serviceFilesPath));
+        $parameters = $serviceYaml['parameters'] ?? [];
 
-        $this->setParameter('storagePath', $storagePath);
+        if (!is_array($parameters)) {
+            throw new \LogicException("Invalid parameters configuration in file {$serviceFilesPath}");
+        }
+
+        foreach ($parameters as $key => $value) {
+            $this->setParameter($key, $value);
+        }
     }
 }
