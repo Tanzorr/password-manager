@@ -4,15 +4,19 @@ namespace App;
 
 class Password
 {
-    public array $attributes;
 
-    public function __construct(array $attributes)
+    public function __construct(private array $attributes)
     {
-        $this->attributes = $attributes;
     }
 
     public function getValue(): string
     {
         return $this->attributes['value'];
     }
+
+    public function getName(): string
+    {
+        return $this->attributes['name'];
+    }
+
 }

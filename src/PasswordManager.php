@@ -121,8 +121,8 @@ class PasswordManager
         if (count($passwords) === 0) {
             $this->io->writeln("<< No passwords found >>");
         }
-        foreach ($passwords as $key => $value) {
-            $this->io->writeln("Password name: " . $key);
+        foreach ($passwords as $password) {
+            $this->io->writeln("Password name: " . $password->getName());
         }
         $this->io->writeln("===============");
 

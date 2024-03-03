@@ -31,15 +31,26 @@ class Store implements RepositoryInterface
      */
     public function findAll(): array
     {
-        return $this->readPasswordsFile();
-    }
+        $passAttr = $this->readPasswordsFile();
 
+        if (!empty($passAttr)) {
+            $passwords = [];
+            foreach ($passAttr as $name => $value) {
+                $passwords[] = new Password(['name' => $name, 'value' => $value]);
+            }
+            return $passwords;
+
+        }
+
+        return [];
+    }
 
 
     /**
      * @throws Exception
      */
-    public function create(array $attributes): object
+    public
+    function create(array $attributes): object
     {
         if (!$this->isPasswordExist($attributes['name'])) {
             $password = new Password($attributes);
@@ -53,7 +64,8 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function addPassword(string $passwordName, string $passwordValue): void
+    public
+    function addPassword(string $passwordName, string $passwordValue): void
     {
         $passwords = $this->readPasswordsFile();
         $passwords[$passwordName] = $passwordValue;
@@ -63,7 +75,8 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function update(array $attributes): bool
+    public
+    function update(array $attributes): bool
     {
         $passwords = $this->readPasswordsFile();
 
@@ -80,7 +93,8 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function delete(int|string $id): bool
+    public
+    function delete(int|string $id): bool
     {
         if ($this->isPasswordExist($id)) {
             $passwords = $this->readPasswordsFile();
@@ -96,7 +110,8 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    private function readPasswordsFile(): array
+    private
+    function readPasswordsFile(): array
     {
         if (!$this->filesystemEncryptor->exists($this->storagePath)) {
             $this->filesystemEncryptor->put($this->storagePath, json_encode([]));
@@ -116,7 +131,8 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    private function isPasswordExist(string $passwordName): bool
+    private
+    function isPasswordExist(string $passwordName): bool
     {
         $passwords = $this->readPasswordsFile();
         if (!array_key_exists($passwordName, $passwords)) {
