@@ -16,35 +16,25 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    private function readPasswordsFile(): array
+    public function find(int|string $id): ?object
     {
-        if (!$this->filesystemEncryptor->exists($this->storagePath)) {
-            $this->filesystemEncryptor->put($this->storagePath, json_encode([]));
-            return [];
+        $password = $this->readPasswordsFile()[$id];
+
+        if ($password) {
+            return new Password(['name' => $id, 'value' => $password]);
         }
-
-        $passwords = $this->filesystemEncryptor->get($this->storagePath);
-
-        if ($passwords === '') {
-            throw new Exception('Access denied');
-        }
-
-        return json_decode($passwords, true);
+        return null;
     }
-
 
     /**
      * @throws Exception
      */
-    private function isPasswordExist(string $passwordName): bool
+    public function findAll(): array
     {
-        $passwords = $this->readPasswordsFile();
-        if (!array_key_exists($passwordName, $passwords)) {
-            return false;
-        }
-
-        return true;
+        return $this->readPasswordsFile();
     }
+
+
 
     /**
      * @throws Exception
@@ -106,21 +96,34 @@ class Store implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public function find(int|string $id): ?object
+    private function readPasswordsFile(): array
     {
-        $password = $this->readPasswordsFile()[$id];
-
-        if ($password) {
-            return new Password(['name' => $id, 'value' => $password]);
+        if (!$this->filesystemEncryptor->exists($this->storagePath)) {
+            $this->filesystemEncryptor->put($this->storagePath, json_encode([]));
+            return [];
         }
-        return null;
+
+        $passwords = $this->filesystemEncryptor->get($this->storagePath);
+
+        if ($passwords === '') {
+            throw new Exception('Access denied');
+        }
+
+        return json_decode($passwords, true);
     }
+
 
     /**
      * @throws Exception
      */
-    public function findAll(): array
+    private function isPasswordExist(string $passwordName): bool
     {
-        return $this->readPasswordsFile();
+        $passwords = $this->readPasswordsFile();
+        if (!array_key_exists($passwordName, $passwords)) {
+            return false;
+        }
+
+        return true;
     }
+
 }
