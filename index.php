@@ -25,7 +25,12 @@ if($encryptionKey === ''){
 }
 
 $container->setParameter('encryptionKey', $encryptionKey);
-$container->load('./service.yaml');
+try {
+    $container->load('./service.yaml');
+} catch (\Exception $e) {
+    $io->writeln($e->getMessage());
+    exit;
+}
 
 try {
     $passwordManager = $container->build(PasswordManager::class);
