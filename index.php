@@ -1,35 +1,40 @@
 <?php
-global $passwordsFilePath;
-use App\Container;
-use App\InputOutput;
-use App\PasswordManager;
+namespace App;
 
-require_once __DIR__ . "/config.php";
 
-spl_autoload_register(/**
- * @throws Exception
- */ callback: function ($className) {
-    $className = str_replace("\\", "/", $className);
-    $className = str_replace("App/", "", $className);
+global $io;
 
-    require_once __DIR__ . "/src/$className.php";
-});
+use ReflectionException;
 
-$io = new InputOutput();
+require_once __DIR__ . "/vendor/autoload.php";
 
-global $encryptorName;
-$encryptorName = $io->expect("Enter your password: ");
-
-if($encryptorName === ''){
-   $io->writeln("Password is empty.");
-    exit();
-}
 
 $container = new Container();
 
 try {
-    $passwordManager = $container->resolveClass(PasswordManager::class);
+    $io = $container->get(InputOutput::class);
+} catch (ReflectionException $e) {
+    $io->writeln($e->getMessage());
+}
+
+$encryptionKey = $io->expect("Enter encryption name: ");
+
+if($encryptionKey === ''){
+    $io->writeln("Encryption name is empty.");
+    exit;
+}
+
+$container->setParameter('encryptionKey', $encryptionKey);
+try {
+    $container->load('./service.yaml');
+} catch (\Exception $e) {
+    $io->writeln($e->getMessage());
+    exit;
+}
+
+try {
+    $passwordManager = $container->build(PasswordManager::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
-    echo $e->getMessage();
+    $io->writeln($e->getMessage());
 }

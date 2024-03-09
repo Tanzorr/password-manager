@@ -4,3 +4,5 @@
 ./passwords.json
 config.php
 passwords.json
+
+/vendor/

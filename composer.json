@@ -1,0 +1,18 @@
+{
+    "name": "root/www",
+    "description": "pass manager",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Oleksander Tukhovskyi"
+        }
+    ],
+    "require": {
+        "symfony/config": "^5.4",
+        "symfony/yaml": "^5.4"
+    }
+}

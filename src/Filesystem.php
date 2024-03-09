@@ -3,18 +3,18 @@
 namespace App;
 class Filesystem
 {
-    public function get(string $path): string
+    public function get(string $storagePath): string
     {
-        return file_get_contents($path);
+        return file_get_contents($storagePath);
     }
 
-    public function put(string $path, string $content): int
+    public function put(string $storagePath, string $content): int
     {
-        return file_put_contents($path, $content);
+        return file_put_contents($storagePath, $content);
     }
 
-    public function exists(string $path): bool
+    public function exists(string $storagePath): bool
     {
-        return file_exists($path);
+        return file_exists($storagePath);
     }
 }
