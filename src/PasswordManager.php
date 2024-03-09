@@ -2,18 +2,18 @@
 
 namespace App;
 
-
+use App\Repository\PasswordRepository;
 use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
+use App\Model\Password;
 
 class PasswordManager
 {
     public function __construct(
         private InputOutput $io,
-        private Store       $store,
-        private AskHelper   $askHelper)
-    {
+        private AskHelper   $askHelper
+    ) {
     }
 
     public function run(): void
@@ -73,7 +73,10 @@ class PasswordManager
         $attributes['name'] = $this->askHelper->askPasswordName();
         $attributes['value'] = $this->askHelper->askPasswordValue();
 
-        $this->store->create($attributes);
+        Password::create($attributes);
+
+        // __callStatic("create", [$attributes]) -> (new Password())->create($attributes);
+        // __call("create", [$attributes]) ->
     }
 
     /**
@@ -82,9 +85,10 @@ class PasswordManager
     private function showPassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        $password = $this->store->find($passwordName);
 
-        $this->io->writeln($password->getValue());
+        $password = Password::find($passwordName);
+
+        $this->io->writeln($password->value);
     }
 
     /**
@@ -93,7 +97,7 @@ class PasswordManager
     private function deletePassword(): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        if ($this->store->delete($passwordName)) {
+        if (Password::delete($passwordName)) {
             $this->io->writeln("$passwordName Password deleted.");
         }
     }
@@ -107,7 +111,7 @@ class PasswordManager
         $attributes['name'] = $this->askHelper->askPasswordName();
         $attributes['value'] = $this->askHelper->askPasswordValue();
 
-        $this->store->update($attributes);
+        Password::update($attributes);
         $this->io->writeln($attributes['name'] . "Password changed.");
     }
 
@@ -116,13 +120,13 @@ class PasswordManager
      */
     private function showAllPasswords(): void
     {
-        $passwords = $this->store->findAll();
+        $passwords = Password::findAll();
         $this->io->writeln("===============");
         if (count($passwords) === 0) {
             $this->io->writeln("<< No passwords found >>");
         }
         foreach ($passwords as $password) {
-            $this->io->writeln("Password name: " . $password->getName());
+            $this->io->writeln("Password name: " . $password->name);
         }
         $this->io->writeln("===============");
 

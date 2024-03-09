@@ -8,7 +8,6 @@ use ReflectionException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
-
 class Container
 {
     /**
@@ -19,9 +18,14 @@ class Container
 
     private array $cache = [];
 
+    private static ?self $instance = null;
+
     public function __construct()
     {
-
+        if(self::$instance !== null){
+            throw new \RuntimeException('Container was already intialized');
+        }
+        self::$instance = $this;
     }
 
 
@@ -107,5 +111,14 @@ class Container
         foreach ($parameters as $key => $value) {
             $this->setParameter($key, $value);
         }
+    }
+
+    public static function getInstance(): self
+    {
+        if(self::$instance === null) {
+            return new self();
+        }
+
+        return self::$instance;
     }
 }
