@@ -8,13 +8,15 @@ use ReflectionException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
-class Container
+class Container // implement PSR-6 ContainerInterface
 {
     /**
      * @var array<string, object|int|array>
      */
 
     private array $parameters = [];
+
+    // private $bindings = ["interface" => "class"]
 
     private array $cache = [];
 
@@ -36,6 +38,9 @@ class Container
     {
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
+
+        // if bind
+        //    class is instance of inteface/class
 
         if ($constructor === null) {
             return $reflection->newInstance();

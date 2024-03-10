@@ -1,2 +1,7 @@
 parameters:
      storagePath: "./passwords.json"
+
+
+# services:
+#   App\Repository\RepositoryInterface: # $container->build(...)
+#     bind: App\Repository\PasswordRepository # returns instance of this class

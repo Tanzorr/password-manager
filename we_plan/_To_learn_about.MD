@@ -1,8 +1,10 @@
 ### php
 - [ ] Why we need to get/set private data through reflection
-- [ ] magic methods
+    -> symfony/serializer DataMapper (deserialize a json string into a class, ex: into a user or product)
+- [x] magic methods
 
 - [ ] Better container understanding
+    -> make interface binding through services.yaml
 - [ ] iterators, generators
 - [ ] xdebug
 
