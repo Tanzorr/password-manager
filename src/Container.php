@@ -19,9 +19,23 @@ class Container
 
     private array $cache = [];
 
+    private static ?self $instance = null;
+
     public function __construct()
     {
+        if(self::$instance !== null) {
+            throw new LogicException("Cannot create another instance of the container");
+        }
+        self::$instance = $this;
+    }
 
+    public static function getInstance():self
+    {
+        if(self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
 

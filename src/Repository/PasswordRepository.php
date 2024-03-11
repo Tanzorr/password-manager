@@ -1,10 +1,12 @@
 <?php
 
-namespace App;
+namespace App\Repository;
 
+use App\FilesystemEncryptor;
+use App\Model\Password;
 use Exception;
 
-class Store implements RepositoryInterface
+class PasswordRepository implements RepositoryInterface
 {
     public function __construct(
         private FilesystemEncryptor $filesystemEncryptor,
