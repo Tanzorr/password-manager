@@ -120,12 +120,15 @@ class PasswordManager
     {
         $passwords = Password::findAll();
         $this->io->writeln("===============");
+
         if (count($passwords) === 0) {
             $this->io->writeln("<< No passwords found >>");
         }
+
         foreach ($passwords as $password) {
             $this->io->writeln("Password name: " . $password->name);
         }
+
         $this->io->writeln("===============");
 
     }

@@ -49,7 +49,7 @@ class Container
         $className = $this->getBind($className);
         $reflection = new \ReflectionClass($className);
 
-        return $this->cache[$className] ??= $this->createInstance($reflection, $className);
+        return $this->cache[$className] ??= $this->createInstanceClass($reflection, $className);
     }
 
     public function setParameter(string $key, string|int|array $value): void
@@ -73,7 +73,6 @@ class Container
      */
     public function load(string $serviceFilesPath): void
     {
-
         $serviceYaml = Yaml::parseFile((new FileLocator(dirname($serviceFilesPath)))->locate($serviceFilesPath));
         $this->binds = array_merge($this->binds, $serviceYaml['binds'] ?? []);
         $parameters = $serviceYaml['parameters'] ?? [];
@@ -122,7 +121,7 @@ class Container
     /**
      * @throws ReflectionException
      */
-    private function createInstance(\ReflectionClass $reflection, string $className): object
+    private function createInstanceClass(\ReflectionClass $reflection, string $className): object
     {
        $constructor = $reflection->getConstructor();
 
