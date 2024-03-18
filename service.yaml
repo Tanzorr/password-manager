@@ -1,2 +1,4 @@
 parameters:
-     storagePath: "./passwords.json"
+  storagePath: "./passwords.json"
+binds:
+  FilesystemInterface: 'App\FilesystemEncryptor'

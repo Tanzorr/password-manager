@@ -18,17 +18,22 @@ abstract class Model
     {
     }
 
- public function __get(string $name): mixed
- {
-     if(!isset($this->attributes[$name])){
-         throw new \LogicException("Attribute $name not found".static::class, 1);
-     }
-     return $this->attributes[$name];
- }
+    public function __get(string $name): mixed
+    {
+        $method = 'get' . ucfirst($name);
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+
+        if (!isset($this->attributes[$name])) {
+            throw new \LogicException("Attribute $name not found" . static::class, 1);
+        }
+        return $this->attributes[$name];
+    }
 
     public function __set(string $name, mixed $value): void
     {
-        if(!isset($this->attributes[$name])) {
+        if (!isset($this->attributes[$name])) {
             // self vs static
             throw new \LogicException("Attribute {$name} not found in class " . static::class, 1);
         }
@@ -38,7 +43,7 @@ abstract class Model
     /**
      * @throws \ReflectionException
      */
-    public function __call(string $name, array $arguments):mixed
+    public function __call(string $name, array $arguments): mixed
     {
         $segments = explode("\\", static::class);
         $modelName = end($segments);
@@ -56,5 +61,4 @@ abstract class Model
 
         return $newModel->$name(...$arguments);
     }
-
 }

@@ -3,13 +3,14 @@
 namespace App\Repository;
 
 use App\FilesystemEncryptor;
+use App\FilesystemInterface;
 use App\Model\Password;
 use Exception;
 
 class PasswordRepository implements RepositoryInterface
 {
     public function __construct(
-        private FilesystemEncryptor $filesystemEncryptor,
+        private FilesystemInterface $filesystemEncryptor,
         private string              $storagePath = '',
     )
     {
@@ -143,5 +144,4 @@ class PasswordRepository implements RepositoryInterface
 
         return true;
     }
-
 }

@@ -17,6 +17,8 @@ class Container
 
     private array $parameters = [];
 
+    private array $binds = [];
+
     private array $cache = [];
 
     private static ?self $instance = null;
@@ -44,6 +46,14 @@ class Container
      */
     public function build(string $className): object
     {
+
+        $classNameArray = explode("\\", $className);
+        $normalizedClassName = end($classNameArray);
+
+        if (isset($this->binds[$normalizedClassName])) {
+            $className = $this->binds[$normalizedClassName];
+        }
+
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
@@ -87,6 +97,11 @@ class Container
         $this->parameters[$key] = $value;
     }
 
+    public function setBind(string $key, string $value): void
+    {
+        $this->binds[$key] = $value;
+    }
+
     /**
      * @throws ReflectionException
      */
@@ -113,6 +128,8 @@ class Container
         $fileLocator = new FileLocator(dirname($serviceFilesPath));
         $serviceYaml = Yaml::parseFile($fileLocator->locate($serviceFilesPath));
         $parameters = $serviceYaml['parameters'] ?? [];
+        $binds = $serviceYaml['binds'] ?? [];
+        $this->binds = array_merge($this->binds, $binds);
 
         if (!is_array($parameters)) {
             throw new \LogicException("Invalid parameters configuration in file {$serviceFilesPath}");

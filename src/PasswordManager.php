@@ -4,7 +4,6 @@ namespace App;
 
 
 use App\Model\Password;
-use App\Repository\PasswordRepository;
 use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
