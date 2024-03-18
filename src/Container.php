@@ -25,15 +25,15 @@ class Container
 
     public function __construct()
     {
-        if(self::$instance !== null) {
+        if (self::$instance !== null) {
             throw new LogicException("Cannot create another instance of the container");
         }
         self::$instance = $this;
     }
 
-    public static function getInstance():self
+    public static function getInstance(): self
     {
-        if(self::$instance === null) {
+        if (self::$instance === null) {
             self::$instance = new self();
         }
 
@@ -42,54 +42,25 @@ class Container
 
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function build(string $className): object
     {
         $className = $this->getBind($className);
-
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
-        if ($constructor === null) {
-            if(isset($this->cache[$className])) {
-                return $this->cache[$className];
-            }
-
-            $this->cache[$className] = $reflection->newInstance();
-
-            return $reflection->newInstance();
+        if (isset($this->cache[$className])) {
+            return $this->cache[$className];
         }
 
-        $dependencies = [];
-        $parameters = $constructor->getParameters();
-
-        if (empty($parameters)) {
-            return $reflection->newInstance();
+        if ($constructor === null || empty($constructor->getParameters())) {
+            return $this->cache[$className] = $reflection->newInstance();
         }
 
-        foreach ($parameters as $parameter) {
-            if ($parameter->getType()->isBuiltin()) {
-                if (!isset($this->parameters[$parameter->getName()])) {
-                    throw new LogicException("No value found for parameter {$parameter->getName()}");
-                }
-                $dependencies[] = $this->parameters[$parameter->getName()];
-                continue;
-            }
+        $dependencies = $this->getDependencies($constructor->getParameters(), $className);
 
-            // Check if the parameter has a type hint
-            $name = $parameter->getType()?->getName();
-
-            // Handle the case where the type is not available
-            if ($name === null) {
-                throw new LogicException("Cannot autowire'
-                 {$parameter->getName()}'
-                 argument of {$className} class. Please specify argument type.");
-            }
-            $dependencies[] = $this->build($name);
-        }
-
-        return $reflection->newInstanceArgs($dependencies);
+        return $this->cache[$className] = $reflection->newInstanceArgs($dependencies);
     }
 
     public function setParameter(string $key, string|int|array $value): void
@@ -145,5 +116,32 @@ class Container
         }
 
         return $className;
+    }
+
+    /**
+     * @param array $parameters
+     * @param string $className
+     * @return array
+     * @throws ReflectionException
+     */
+    private function getDependencies(array $parameters, string $className): array
+    {
+        return array_map(function ($parameter) use ($className) {
+            $parameterType = $parameter->getType();
+            $parameterName = $parameter->getName();
+
+            if ($parameterType->isBuiltin()) {
+                if (!isset($this->parameters[$parameterName])) {
+                    throw new LogicException("No value found for parameter {$parameterName}");
+                }
+                return $this->parameters[$parameterName];
+            }
+
+            $name = $parameterType->getName();
+            if ($name === null) {
+                throw new LogicException("Cannot autowire {$parameterName} argument of {$className} class. Please specify argument type.");
+            }
+            return $this->build($name);
+        }, $parameters);
     }
 }
