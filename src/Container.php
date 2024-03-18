@@ -48,19 +48,8 @@ class Container
     {
         $className = $this->getBind($className);
         $reflection = new \ReflectionClass($className);
-        $constructor = $reflection->getConstructor();
 
-        if (isset($this->cache[$className])) {
-            return $this->cache[$className];
-        }
-
-        if ($constructor === null || empty($constructor->getParameters())) {
-            return $this->cache[$className] = $reflection->newInstance();
-        }
-
-        $dependencies = $this->getDependencies($constructor->getParameters(), $className);
-
-        return $this->cache[$className] = $reflection->newInstanceArgs($dependencies);
+        return $this->cache[$className] ??= $this->createInstance($reflection, $className);
     }
 
     public function setParameter(string $key, string|int|array $value): void
@@ -73,17 +62,10 @@ class Container
      */
     public function get(string $key): mixed
     {
-        if (class_exists($key)) {
-            $this->cache[$key] ??= $this->build($key);
-
-            return $this->cache[$key];
-        }
-
-        if ($this->parameters[$key]) {
-            return $this->parameters[$key];
-        }
-
-        throw new LogicException("No value found for parameter {$key}");
+        return class_exists($key)
+            ? $this->cache[$key] ??= $this->build($key)
+            : ($this->parameters[$key]
+            ?? throw new LogicException("No value found for parameter {$key}"));
     }
 
     /**
@@ -91,31 +73,24 @@ class Container
      */
     public function load(string $serviceFilesPath): void
     {
-        $fileLocator = new FileLocator(dirname($serviceFilesPath));
-        $serviceYaml = Yaml::parseFile($fileLocator->locate($serviceFilesPath));
+
+        $serviceYaml = Yaml::parseFile((new FileLocator(dirname($serviceFilesPath)))->locate($serviceFilesPath));
+        $this->binds = array_merge($this->binds, $serviceYaml['binds'] ?? []);
         $parameters = $serviceYaml['parameters'] ?? [];
-        $binds = $serviceYaml['binds'] ?? [];
-        $this->binds = array_merge($this->binds, $binds);
+
+        foreach ($parameters ?? [] as $key => $value) {
+            $this->setParameter($key, $value);
+        }
 
         if (!is_array($parameters)) {
             throw new \LogicException("Invalid parameters configuration in file {$serviceFilesPath}");
-        }
-
-        foreach ($parameters as $key => $value) {
-            $this->setParameter($key, $value);
         }
     }
 
     private function getBind(string $className): string
     {
         $classNameArray = explode("\\", $className);
-        $normalizedClassName = end($classNameArray);
-
-        if (isset($this->binds[$normalizedClassName])) {
-            $className = $this->binds[$normalizedClassName];
-        }
-
-        return $className;
+        return $this->binds[end($classNameArray)] ?? $className;
     }
 
     /**
@@ -126,22 +101,35 @@ class Container
      */
     private function getDependencies(array $parameters, string $className): array
     {
-        return array_map(function ($parameter) use ($className) {
-            $parameterType = $parameter->getType();
-            $parameterName = $parameter->getName();
+      return array_map(fn($parameter) => $this->getDependency($parameter, $className), $parameters);
+    }
 
-            if ($parameterType->isBuiltin()) {
-                if (!isset($this->parameters[$parameterName])) {
-                    throw new LogicException("No value found for parameter {$parameterName}");
-                }
-                return $this->parameters[$parameterName];
-            }
+    /**
+     * @throws ReflectionException
+     */
+    private function getDependency($parameter, string $className): mixed
+    {
+        $parameterType = $parameter->getType();
+        $parameterName = $parameter->getName();
 
-            $name = $parameterType->getName();
-            if ($name === null) {
-                throw new LogicException("Cannot autowire {$parameterName} argument of {$className} class. Please specify argument type.");
-            }
-            return $this->build($name);
-        }, $parameters);
+        if ($parameterType->isBuiltin()) {
+          return $this->parameters[$parameterName] ?? throw new LogicException("No value found for parameter {$parameterName}");
+        }
+
+       return $this->build($parameterType->getName()) ?? throw new LogicException("Cannot autowire {$parameterName} argument of {$className} class. Please specify argument type.");
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    private function createInstance(\ReflectionClass $reflection, string $className): object
+    {
+       $constructor = $reflection->getConstructor();
+
+       if($constructor === null || empty($constructor->getParameters())) {
+           return $reflection->newInstance();
+       }
+
+       return $reflection->newInstanceArgs($this->getDependencies($constructor->getParameters(), $className));
     }
 }
