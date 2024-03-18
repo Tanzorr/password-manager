@@ -46,18 +46,18 @@ class Container
      */
     public function build(string $className): object
     {
-
-        $classNameArray = explode("\\", $className);
-        $normalizedClassName = end($classNameArray);
-
-        if (isset($this->binds[$normalizedClassName])) {
-            $className = $this->binds[$normalizedClassName];
-        }
+        $className = $this->getBind($className);
 
         $reflection = new \ReflectionClass($className);
         $constructor = $reflection->getConstructor();
 
         if ($constructor === null) {
+            if(isset($this->cache[$className])) {
+                return $this->cache[$className];
+            }
+
+            $this->cache[$className] = $reflection->newInstance();
+
             return $reflection->newInstance();
         }
 
@@ -97,11 +97,6 @@ class Container
         $this->parameters[$key] = $value;
     }
 
-    public function setBind(string $key, string $value): void
-    {
-        $this->binds[$key] = $value;
-    }
-
     /**
      * @throws ReflectionException
      */
@@ -138,5 +133,17 @@ class Container
         foreach ($parameters as $key => $value) {
             $this->setParameter($key, $value);
         }
+    }
+
+    private function getBind(string $className): string
+    {
+        $classNameArray = explode("\\", $className);
+        $normalizedClassName = end($classNameArray);
+
+        if (isset($this->binds[$normalizedClassName])) {
+            $className = $this->binds[$normalizedClassName];
+        }
+
+        return $className;
     }
 }

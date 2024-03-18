@@ -83,8 +83,10 @@ class PasswordManager
     {
         $passwordName = $this->askHelper->askPasswordName();
         $password = Password::find($passwordName);
+        $hash = $password->hashedPassword;
 
         $this->io->writeln($password->value);
+        $this->io->writeln($hash);
     }
 
     /**
