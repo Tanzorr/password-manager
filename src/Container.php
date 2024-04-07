@@ -9,7 +9,8 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\Yaml\Yaml;
 
 
-class Container
+
+class Container implements CachItemInterface
 {
     /**
      * @var array<string, object|int|array>

@@ -14,6 +14,7 @@
     "require": {
         "symfony/config": "^5.4",
         "symfony/yaml": "^5.4",
-      "ext-openssl": "*"
+      "ext-openssl": "*",
+        "ext-readline": "*"
     }
 }
