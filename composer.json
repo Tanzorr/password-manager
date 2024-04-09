@@ -14,7 +14,9 @@
     "require": {
         "symfony/config": "^5.4",
         "symfony/yaml": "^5.4",
-      "ext-openssl": "*",
-        "ext-readline": "*"
+        "ext-openssl": "*",
+        "ext-readline": "*",
+        "illuminate/container": "^11.3",
+        "php-school/cli-menu": "^4.3"
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use Illuminate\Container\Container;
+
 /*
  * @method static find()
  * method static static create(array $attributes)
@@ -9,8 +11,6 @@ namespace App\Model;
  * @method static bool delete(int|string $id)
  * @method static static[]findAll()
  */
-
-use App\Container;
 
 abstract class Model
 {
@@ -49,7 +49,7 @@ abstract class Model
         $modelName = end($segments);
 
         $container = Container::getInstance();
-        $modelRepository = $container->get("App\\Repository\\{$modelName}Repository");
+        $modelRepository = $container->make("App\\Repository\\{$modelName}Repository");
 
         return $modelRepository->$name(...$arguments);
     }

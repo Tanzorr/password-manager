@@ -1,21 +1,21 @@
 <?php
-namespace App;
 
-
-global $io;
-
-use ReflectionException;
+use App\Config;
+use App\InputOutput;
+use App\PasswordManager;
+use Illuminate\Container\Container;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
+$container = Container::getInstance();
 
-$container = new Container();
+$container->singleton(Config::class, function() {
+    return new Config([
+        'storagePath' => __DIR__.'/passwords.json'
+    ]);
+});
 
-try {
-    $io = $container->get(InputOutput::class);
-} catch (ReflectionException $e) {
-    $io->writeln($e->getMessage());
-}
+$io = $container->get(InputOutput::class);
 
 $encryptionKey = $io->expect("Enter encryption name: ");
 
@@ -24,16 +24,11 @@ if($encryptionKey === ''){
     exit;
 }
 
-$container->setParameter('encryptionKey', $encryptionKey);
-try {
-    $container->load('./service.yaml');
-} catch (\Exception $e) {
-    $io->writeln($e->getMessage());
-    exit;
-}
+$container->get(Config::class)->set('encryptionKey', $encryptionKey);
+
 
 try {
-    $passwordManager = $container->build(PasswordManager::class);
+    $passwordManager = $container->get(PasswordManager::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
     $io->writeln($e->getMessage());

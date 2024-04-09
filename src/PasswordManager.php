@@ -7,6 +7,7 @@ use App\Model\Password;
 use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
+use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 
 class PasswordManager
 {
@@ -24,8 +25,8 @@ class PasswordManager
             try {
                 $this->showMenu();
                 $action = $this->io->expect("Choose action: ");
-                passthru('clear');
-                $this->getChosenAction($action);
+                // passthru('clear');
+                // $this->getChosenAction($action);
             } catch (DomainException $error) {
                 $this->io->writeln("====================");
                 $this->io->writeln("[ERROR]{$error->getMessage()}");
@@ -36,15 +37,24 @@ class PasswordManager
 
     private function showMenu(): void
     {
-        $this->io->writeln("===============");
-        $this->io->writeln("Menu actions:");
-        $this->io->writeln("[s] Show password");
-        $this->io->writeln("[a] Add password");
-        $this->io->writeln("[d] Delete password");
-        $this->io->writeln("[c] Change password");
-        $this->io->writeln("[l] List all passwords names");
-        $this->io->writeln("[q] Exit");
-        $this->io->writeln("===============");
+        
+    $menu = (new CliMenuBuilder)
+        ->setTitle('PassMan')
+        ->addItem('Show password', $this->showPassword(...))
+        ->addItem('List passwords', $this->showAllPasswords(...))
+        // ->addLineBreak('-')
+        ->build();
+
+        $menu->open();
+        // $this->io->writeln("===============");
+        // $this->io->writeln("Menu actions:");
+        // $this->io->writeln("[s] Show password");
+        // $this->io->writeln("[a] Add password");
+        // $this->io->writeln("[d] Delete password");
+        // $this->io->writeln("[c] Change password");
+        // $this->io->writeln("[l] List all passwords names");
+        // $this->io->writeln("[q] Exit");
+        // $this->io->writeln("===============");
     }
 
     /**
@@ -83,10 +93,10 @@ class PasswordManager
     {
         $passwordName = $this->askHelper->askPasswordName();
         $password = Password::find($passwordName);
-        $hash = $password->hashedPassword;
 
-        $this->io->writeln($password->value);
-        $this->io->writeln($hash);
+        print_r($password);
+        $this->io->writeln("Original: " . $password->value);
+        $this->io->writeln("MD5 hash: " . $password->hashedPassword);
     }
 
     /**

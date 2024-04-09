@@ -2,17 +2,22 @@
 
 namespace App\Repository;
 
+use App\Config;
+use App\FilesystemEncryptor;
 use App\FilesystemInterface;
 use App\Model\Password;
 use Exception;
 
 class PasswordRepository implements RepositoryInterface
 {
+    protected string $storagePath;
+
     public function __construct(
-        private FilesystemInterface $filesystemEncryptor,
-        private string              $storagePath = '',
-    )
-    {
+        private FilesystemEncryptor $filesystemEncryptor,
+        // private FilesystemInterface $filesystemEncryptor,
+        private Config $config,
+    ) {
+        $this->storagePath = $config->get('storagePath');
     }
 
     /**
@@ -45,15 +50,14 @@ class PasswordRepository implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public
-    function create(array $attributes): object
+    public function create(array $attributes): object
     {
-        if($this->isPasswordExist($attributes['name'])){
+        if($this->isPasswordExist($attributes['name'])) {
             throw new Exception("Password already exists.");
         }
 
         $password = new Password($attributes);
-        $this->addPassword( $attributes['name'], $attributes['value']);
+        $this->addPassword($attributes['name'], $attributes['value']);
 
         return $password;
     }
@@ -61,8 +65,7 @@ class PasswordRepository implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public
-    function addPassword(string $passwordName, string $passwordValue): void
+    public function addPassword(string $passwordName, string $passwordValue): void
     {
         $this->filesystemEncryptor->put($this->storagePath, json_encode(
             array_merge($this->readPasswordsFile(), [$passwordName => $passwordValue])
@@ -72,8 +75,7 @@ class PasswordRepository implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public
-    function update(array $attributes): bool
+    public function update(array $attributes): bool
     {
         if ($this->isPasswordExist($attributes['name'])) {
             $this->filesystemEncryptor->put($this->storagePath, json_encode(
@@ -90,8 +92,7 @@ class PasswordRepository implements RepositoryInterface
     /**
      * @throws Exception
      */
-    public
-    function delete(int|string $id): bool
+    public function delete(int|string $id): bool
     {
         if ($this->isPasswordExist($id)) {
             $this->filesystemEncryptor->put($this->storagePath, json_encode(
@@ -109,8 +110,7 @@ class PasswordRepository implements RepositoryInterface
      */
     private function readPasswordsFile(): array
     {
-        $passwords = $this->filesystemEncryptor->get($this->storagePath)
-            ?: json_encode([]);
+        $passwords = $this->filesystemEncryptor->get($this->storagePath) ?? json_encode([]);
 
         if ($passwords === '') {
             throw new Exception('Access denied');
@@ -128,3 +128,4 @@ class PasswordRepository implements RepositoryInterface
         return array_key_exists($passwordName, $this->readPasswordsFile());
     }
 }
+
