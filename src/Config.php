@@ -10,22 +10,22 @@ class Config implements ConfigContract
     }
 
 
-    public function has($key)
+    public function has($key):bool
     {
-        // TODO: Implement has() method.
+        return isset($this->parameters[$key]);
     }
 
-    public function get($key, $default = null)
+    public function get($key, $default = null):string
     {
         return $this->parameters[$key] ?? $default ?? new \LogicException("Key {$key} not found");
     }
 
-    public function all()
+    public function all():array
     {
-        // TODO: Implement all() method.
+        return $this->parameters;
     }
 
-    public function set($key, $value = null)
+    public function set($key, $value = null):self
     {
         $this->parameters[$key] = $value;
         return $this;
