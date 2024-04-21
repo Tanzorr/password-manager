@@ -2,16 +2,16 @@
 use App\InputOutput;
 use App\PasswordManager;
 use Illuminate\Container\Container;
-use App\Config;
+use Illuminate\Contracts\Config\Repository;
+
 
 require_once __DIR__ . "/vendor/autoload.php";
 
 $container = Container::getInstance();
 
-$container->singleton(Config::class, function () {
-    return new Config([
-        'storagePath' => __DIR__ . '/passwords.json',
-    ]);
+$container->singleton(Repository::class, function () {
+    $configValues = require_once __DIR__ . '/config/app.php';
+    return Repository::getInstance($configValues);
 });
 
 $io = $container->get(InputOutput::class);
