@@ -2,17 +2,21 @@
 
 namespace App\Repository;
 
+use App\Config;
+use App\FilesystemEncryptor;
 use App\FilesystemInterface;
 use App\Model\Password;
 use Exception;
 
 class PasswordRepository implements RepositoryInterface
 {
+    protected string $storagePath;
     public function __construct(
-        private FilesystemInterface $filesystemEncryptor,
-        private string              $storagePath = '',
+        private FilesystemEncryptor $filesystemEncryptor,
+        private Config $config
     )
     {
+        $this->storagePath = $this->config->get('storagePath');
     }
 
     /**

@@ -8,8 +8,12 @@ use JetBrains\PhpStorm\NoReturn;
 
 class Encryptor
 {
-    #[NoReturn] public function __construct(private string $encryptionKey = '')
+    private string $encryptionKey = '';
+     public function __construct(
+         protected Config $config
+     )
     {
+        $this->encryptionKey = $this->config->get('encryptionKey');
     }
 
     public function encrypt(string $string): string

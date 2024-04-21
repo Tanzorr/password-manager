@@ -19,6 +19,9 @@ class FilesystemEncryptor implements FilesystemInterface
 
     public function get(string $path): string
     {
+        if(!$this->exists($path)) {
+            return '';
+        }
         return $this->encryptor->decrypt($this->filesystem->get($path));
     }
 

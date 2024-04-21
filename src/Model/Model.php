@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use Illuminate\Container\Container;
+
 /*
  * @method static find()
  * method static static create(array $attributes)
@@ -10,7 +12,6 @@ namespace App\Model;
  * @method static static[]findAll()
  */
 
-use App\Container;
 
 abstract class Model
 {
