@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9bdf6842bd5bb023e4120e0737aca0f4",
+    "content-hash": "579e6f5d3b746862569bb5e22f6b848e",
     "packages": [
         {
             "name": "beberlei/assert",
@@ -72,6 +72,155 @@
                 "source": "https://github.com/beberlei/assert/tree/v3.3.2"
             },
             "time": "2021-12-16T21:41:27+00:00"
+        },
+        {
+            "name": "illuminate/collections",
+            "version": "v11.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/collections.git",
+                "reference": "19c6554c7eba0efabc3f8aa4c434815b7f6b4b7d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/collections/zipball/19c6554c7eba0efabc3f8aa4c434815b7f6b4b7d",
+                "reference": "19c6554c7eba0efabc3f8aa4c434815b7f6b4b7d",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/conditionable": "^11.0",
+                "illuminate/contracts": "^11.0",
+                "illuminate/macroable": "^11.0",
+                "php": "^8.2"
+            },
+            "suggest": {
+                "symfony/var-dumper": "Required to use the dump method (^7.0)."
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "11.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "helpers.php"
+                ],
+                "psr-4": {
+                    "Illuminate\\Support\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Collections package.",
+            "homepage": "https://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2024-04-15T15:26:05+00:00"
+        },
+        {
+            "name": "illuminate/conditionable",
+            "version": "v11.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/conditionable.git",
+                "reference": "8a558fec063b6a63da1c3af1d219c0f998edffeb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/conditionable/zipball/8a558fec063b6a63da1c3af1d219c0f998edffeb",
+                "reference": "8a558fec063b6a63da1c3af1d219c0f998edffeb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "11.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Support\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Conditionable package.",
+            "homepage": "https://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2024-04-04T17:36:49+00:00"
+        },
+        {
+            "name": "illuminate/config",
+            "version": "v11.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/config.git",
+                "reference": "0dea1af0006a46bd7effaa7964c47cf76214d1d9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/config/zipball/0dea1af0006a46bd7effaa7964c47cf76214d1d9",
+                "reference": "0dea1af0006a46bd7effaa7964c47cf76214d1d9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/collections": "^11.0",
+                "illuminate/contracts": "^11.0",
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "11.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Config\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Config package.",
+            "homepage": "https://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2024-02-28T16:28:16+00:00"
         },
         {
             "name": "illuminate/container",
@@ -171,6 +320,52 @@
                 "source": "https://github.com/laravel/framework"
             },
             "time": "2024-04-04T17:36:49+00:00"
+        },
+        {
+            "name": "illuminate/macroable",
+            "version": "v11.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/illuminate/macroable.git",
+                "reference": "e1be58f9b2af73f242dc6a9add1f376b3ec89eef"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/illuminate/macroable/zipball/e1be58f9b2af73f242dc6a9add1f376b3ec89eef",
+                "reference": "e1be58f9b2af73f242dc6a9add1f376b3ec89eef",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "11.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Illuminate\\Support\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Taylor Otwell",
+                    "email": "taylor@laravel.com"
+                }
+            ],
+            "description": "The Illuminate Macroable package.",
+            "homepage": "https://laravel.com",
+            "support": {
+                "issues": "https://github.com/laravel/framework/issues",
+                "source": "https://github.com/laravel/framework"
+            },
+            "time": "2023-06-08T14:08:27+00:00"
         },
         {
             "name": "php-school/cli-menu",

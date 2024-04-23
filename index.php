@@ -2,16 +2,17 @@
 use App\InputOutput;
 use App\PasswordManager;
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Config\Repository;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;
 
 
 require_once __DIR__ . "/vendor/autoload.php";
 
 $container = Container::getInstance();
 
-$container->singleton(Repository::class, function () {
+$container->singleton(ConfigRepositoryInterface::class, function () {
     $configValues = require_once __DIR__ . '/config/app.php';
-    return Repository::getInstance($configValues);
+    return new Repository($configValues);
 });
 
 $io = $container->get(InputOutput::class);
@@ -24,7 +25,8 @@ if($encryptionKey === ''){
     exit;
 }
 
-$container->get(Config::class)->set('encryptionKey', $encryptionKey);
+$container->get(ConfigRepositoryInterface::class)->set('encryptionKey', $encryptionKey);
+
 
 
 try {

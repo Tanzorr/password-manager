@@ -17,6 +17,7 @@
     "ext-openssl": "*",
     "ext-readline": "*",
     "illuminate/container": "^11.3",
-    "php-school/cli-menu": "^4.3"
+    "php-school/cli-menu": "^4.3",
+    "illuminate/config": "^11.5"
   }
 }

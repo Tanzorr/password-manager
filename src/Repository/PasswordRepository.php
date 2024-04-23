@@ -7,13 +7,14 @@ use App\FilesystemEncryptor;
 use App\FilesystemInterface;
 use App\Model\Password;
 use Exception;
+use Illuminate\Contracts\Config\Repository;
 
 class PasswordRepository implements RepositoryInterface
 {
     protected string $storagePath;
     public function __construct(
         private FilesystemEncryptor $filesystemEncryptor,
-        private Config $config
+        private Repository $config
     )
     {
         $this->storagePath = $this->config->get('storagePath');
