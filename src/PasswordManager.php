@@ -7,6 +7,8 @@ use App\Model\Password;
 use DomainException;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
+use PhpSchool\CliMenu\Builder\CliMenuBuilder;
+use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class PasswordManager
 {
@@ -25,7 +27,6 @@ class PasswordManager
                 $this->showMenu();
                 $action = $this->io->expect("Choose action: ");
                 passthru('clear');
-                $this->getChosenAction($action);
             } catch (DomainException $error) {
                 $this->io->writeln("====================");
                 $this->io->writeln("[ERROR]{$error->getMessage()}");
@@ -34,33 +35,22 @@ class PasswordManager
         }
     }
 
+    /**
+     * @throws InvalidTerminalException
+     */
     private function showMenu(): void
     {
-        $this->io->writeln("===============");
-        $this->io->writeln("Menu actions:");
-        $this->io->writeln("[s] Show password");
-        $this->io->writeln("[a] Add password");
-        $this->io->writeln("[d] Delete password");
-        $this->io->writeln("[c] Change password");
-        $this->io->writeln("[l] List all passwords names");
-        $this->io->writeln("[q] Exit");
-        $this->io->writeln("===============");
-    }
+        $menu = (new CliMenuBuilder())
+            ->setTitle("Menu actions:")
+            ->addItem("Show password", $this->showPassword(...))
+            ->addItem("Add password", $this->addPassword(...))
+            ->addItem("Delete password", $this->deletePassword(...))
+            ->addItem("Change password", $this->changePassword(...))
+            ->addItem("List all passwords names", $this->showAllPasswords(...))
+            ->addItem("logout", $this->logout(...))
+            ->build();
 
-    /**
-     * @throws Exception;
-     */
-    private function getChosenAction(string $action): void
-    {
-        match ($action) {
-            "l" => $this->showAllPasswords(),
-            "a" => $this->addPassword(),
-            "s" => $this->showPassword(),
-            "d" => $this->deletePassword(),
-            "c" => $this->changePassword(),
-            "q" => $this->logout(),
-            default => $this->io->writeln("[ERROR]Unknown action"),
-        };
+        $menu->open();
     }
 
     /**

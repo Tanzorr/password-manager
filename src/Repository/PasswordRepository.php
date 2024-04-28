@@ -12,9 +12,10 @@ use Illuminate\Contracts\Config\Repository;
 class PasswordRepository implements RepositoryInterface
 {
     protected string $storagePath;
+
     public function __construct(
         private FilesystemEncryptor $filesystemEncryptor,
-        private Repository $config
+        private Repository          $config
     )
     {
         $this->storagePath = $this->config->get('storagePath');
@@ -53,12 +54,12 @@ class PasswordRepository implements RepositoryInterface
     public
     function create(array $attributes): object
     {
-        if($this->isPasswordExist($attributes['name'])){
+        if ($this->isPasswordExist($attributes['name'])) {
             throw new Exception("Password already exists.");
         }
 
         $password = new Password($attributes);
-        $this->addPassword( $attributes['name'], $attributes['value']);
+        $this->addPassword($attributes['name'], $attributes['value']);
 
         return $password;
     }
@@ -82,8 +83,8 @@ class PasswordRepository implements RepositoryInterface
     {
         if ($this->isPasswordExist($attributes['name'])) {
             $this->filesystemEncryptor->put($this->storagePath, json_encode(
-                $this->readPasswordsFile(),
-                [$attributes['name'] => $attributes['value']]
+                array_merge($this->readPasswordsFile(),
+                    [$attributes['name'] => $attributes['value']])
             ));
 
             return true;
