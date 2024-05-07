@@ -1,6 +1,6 @@
 <?php
 use App\InputOutput;
-use App\PasswordManager;
+use App\VaultManger;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;
@@ -16,21 +16,12 @@ $container->singleton(ConfigRepositoryInterface::class, function () {
 });
 
 $io = $container->get(InputOutput::class);
-
-
-$encryptionKey = $io->expect("Enter encryption name: ");
-
-if($encryptionKey === ''){
-    $io->writeln("Encryption name is empty.");
-    exit;
-}
+$encryptionKey = 'test';
 
 $container->get(ConfigRepositoryInterface::class)->set('encryptionKey', $encryptionKey);
 
-
-
 try {
-    $passwordManager = $container->get(PasswordManager::class);
+    $passwordManager = $container->get(VaultManger::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
     $io->writeln($e->getMessage());

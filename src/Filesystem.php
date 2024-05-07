@@ -17,4 +17,18 @@ class Filesystem
     {
         return file_exists($storagePath);
     }
+
+    public function delete(string $storagePath): bool
+    {
+        return unlink($storagePath);
+    }
+    public function getAllFiles(string $storagePath): array
+    {
+        return scandir($storagePath);
+    }
+
+    public function createFile(string $storagePath): bool
+    {
+        return mkdir($storagePath,0777, true);
+    }
 }

@@ -2,43 +2,27 @@
 
 namespace App;
 
-
 use App\Model\Password;
-use DomainException;
+use App\Model\Vault;
 use Exception;
-use JetBrains\PhpStorm\NoReturn;
+use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class PasswordManager
 {
     public function __construct(
-        private InputOutput        $io,
-        private AskHelper          $askHelper)
+        private InputOutput $io,
+        private AskHelper   $askHelper,
+        private Repository  $config
+    )
     {
-    }
-
-    public function run(): void
-    {
-        $this->io->writeln("Welcome to Password Manager");
-
-        while (true) {
-            try {
-                $this->showMenu();
-                $action = $this->io->expect("Choose action: ");
-                passthru('clear');
-            } catch (DomainException $error) {
-                $this->io->writeln("====================");
-                $this->io->writeln("[ERROR]{$error->getMessage()}");
-                $this->io->writeln("====================");
-            }
-        }
     }
 
     /**
      * @throws InvalidTerminalException
      */
-    private function showMenu(): void
+    public function showMenu(): void
     {
         $menu = (new CliMenuBuilder())
             ->setTitle("Menu actions:")
@@ -58,12 +42,17 @@ class PasswordManager
      */
     private function addPassword(): void
     {
-        $attributes = [];
+        Password::create([
+            'name' => $this->askHelper->askPasswordName(),
+            'value' => $this->askHelper->askPasswordValue()
+        ]);
 
-        $attributes['name'] = $this->askHelper->askPasswordName();
-        $attributes['value'] = $this->askHelper->askPasswordValue();
+        Vault::update([
+            'name' => $this->config->get('activeVault'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
 
-        Password::create($attributes);
+        $this->showMenu();
     }
 
     /**
@@ -71,12 +60,7 @@ class PasswordManager
      */
     private function showPassword(): void
     {
-        $passwordName = $this->askHelper->askPasswordName();
-        $password = Password::find($passwordName);
-        $hash = $password->hashedPassword;
-
-        $this->io->writeln($password->value);
-        $this->io->writeln($hash);
+        $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
     }
 
     /**
@@ -84,10 +68,14 @@ class PasswordManager
      */
     private function deletePassword(): void
     {
-        $passwordName = $this->askHelper->askPasswordName();
-        if (Password::delete($passwordName)) {
+        if (Password::delete($passwordName = $this->askHelper->askPasswordName())) {
             $this->io->writeln("$passwordName Password deleted.");
+            Vault::update([
+                'name' => $this->config->get('activeVault'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
         }
+        $this->showMenu();
     }
 
     /**
@@ -95,12 +83,17 @@ class PasswordManager
      */
     private function changePassword(): void
     {
-        $attributes = [];
-        $attributes['name'] = $this->askHelper->askPasswordName();
-        $attributes['value'] = $this->askHelper->askPasswordValue();
+        Password::update([
+            'name' => $this->askHelper->askPasswordName(),
+            'value' => $this->askHelper->askPasswordValue()
+        ]);
 
-        Password::update($attributes);
-        $this->io->writeln($attributes['name'] . "Password changed.");
+        Vault::update([
+            'name' => $this->config->get('activeVault'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $this->showMenu();
     }
 
     /**
@@ -120,7 +113,6 @@ class PasswordManager
         }
 
         $this->io->writeln("===============");
-
     }
 
     #[NoReturn] private function logout(): void

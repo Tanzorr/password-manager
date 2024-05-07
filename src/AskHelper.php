@@ -18,6 +18,11 @@ class AskHelper
         return $this->askField('password value');
     }
 
+    public function askVaultName(): string
+    {
+        return $this->askField('vault name');
+    }
+
     private function askField(string $fieldName): string
     {
         $fieldVal = $this->io->expect("Enter $fieldName: ");

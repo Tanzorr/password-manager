@@ -2,9 +2,8 @@
 
 namespace App\Repository;
 
-use App\Config;
+
 use App\FilesystemEncryptor;
-use App\FilesystemInterface;
 use App\Model\Password;
 use Exception;
 use Illuminate\Contracts\Config\Repository;

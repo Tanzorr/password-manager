@@ -1,6 +1,9 @@
 <?php
+$root_path = $_SERVER['DOCUMENT_ROOT'];
 
 return [
-    'storagePath' => __DIR__ . '/passwords.json',
-    'parameters'=> __DIR__ .'./service.yaml'
+    'parameters'=> './service.yaml',
+    'vaultsStoragePath' =>'./vaults/',
+    'vaultsLogs' => './vaults/vault-log.json',
+    'activeVault' => '',
 ];

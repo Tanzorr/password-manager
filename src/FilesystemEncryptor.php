@@ -29,4 +29,14 @@ class FilesystemEncryptor implements FilesystemInterface
     {
         return $this->filesystem->put($path, $this->encryptor->encrypt($content));
     }
+
+    public function getAllFiles(mixed $vaultsStoragePath)
+    {
+        return $this->filesystem->getAllFiles($vaultsStoragePath);
+    }
+
+    public function delete(string $path): bool
+    {
+        return $this->filesystem->delete($path);
+    }
 }
