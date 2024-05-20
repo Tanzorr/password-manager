@@ -4,6 +4,6 @@ $root_path = $_SERVER['DOCUMENT_ROOT'];
 return [
     'parameters'=> './service.yaml',
     'vaultsStoragePath' =>'./vaults/',
-    'vaultsLogs' => './vaults/vault-log.json',
+    'vaultsLogs' => './logs/vault-log.json',
     'activeVault' => '',
 ];
