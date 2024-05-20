@@ -53,6 +53,9 @@ class VaultManger
     public function selectVault(): void
     {
         $vaults = array_diff(Vault::findAll(), ['.', '..']);
+        if(count($vaults) === 0){
+            throw new DomainException("No vaults found");
+        }
         $menuBuilder = (new CliMenuBuilder())->setTitle('Select vaults:');
 
         array_walk($vaults, function ($vault) use ($menuBuilder) {
@@ -96,13 +99,11 @@ class VaultManger
             'name' => $this->askHelper->askVaultName(),
             'created_at' => date('Y-m-d H:i:s')
         ]);
-        $this->showVaultsMenu();
     }
 
     public function deleteVault(): void
     {
         Vault::delete($this->askHelper->askVaultName());
-        $this->showVaultsMenu();
     }
 
     #[NoReturn] private function logout(): void

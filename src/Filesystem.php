@@ -10,6 +10,10 @@ class Filesystem
 
     public function put(string $storagePath, string $content): int
     {
+        if(!file_exists(dirname($storagePath))) {
+            mkdir(dirname($storagePath), 0777, true);
+        }
+
         return file_put_contents($storagePath, $content);
     }
 
@@ -24,11 +28,16 @@ class Filesystem
     }
     public function getAllFiles(string $storagePath): array
     {
+        if(scandir($storagePath) === false){
+            return [];
+        }
+
         return scandir($storagePath);
     }
 
     public function createFile(string $storagePath): bool
     {
-        return mkdir($storagePath,0777, true);
+        mkdir($storagePath,0777, true);
+        return true;
     }
 }
