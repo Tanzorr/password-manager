@@ -1,7 +1,7 @@
 <?php
 # этот фаил для консольных команд
-use App\InputOutput;
 use App\Adapter\Console\Controller\VaultController;
+use App\Core\Console\InputOutput;
 use Illuminate\Container\Container;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;

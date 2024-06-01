@@ -2,8 +2,8 @@
 
 namespace App\Adapter\Console\Controller;
 
+use App\Core\Console\InputOutput;
 use App\Domain\Model\Vault;
-use App\InputOutput;
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
@@ -97,15 +97,22 @@ class VaultController
 
     public function addVault(): void
     {
-        Vault::create([
-            'name' => $this->io->expect("Vault:"),
+        $vault = Vault::create([
+            'name' => $vaultName = $this->io->expect("Vault:"),
             'created_at' => date('Y-m-d H:i:s')
         ]);
+
+        $this->inputOutput->writeln("Vault {$vaultName} created successfully");
     }
 
     public function deleteVault(): void
     {
-        Vault::delete($this->io->expect("Vault:"));
+        if(Vault::delete($id = $this->io->expect("Vault:"))) {
+            $this->inputOutput->writeln('Vault' . $id . ' deleted successfully');
+        } else {
+            $this->inputOutput->writeln('Vault ' . $id . ' does not exist');
+
+        }
     }
 
     #[NoReturn] private function logout(): void

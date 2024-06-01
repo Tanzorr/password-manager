@@ -2,9 +2,9 @@
 
 namespace App\Adapter\Console\Controller;
 
+use App\Core\Console\InputOutput;
 use App\Domain\Model\Password;
 use App\Domain\Model\Vault;
-use App\InputOutput;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Illuminate\Contracts\Config\Repository;
