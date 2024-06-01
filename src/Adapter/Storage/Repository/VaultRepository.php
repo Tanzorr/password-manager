@@ -5,7 +5,6 @@ namespace App\Adapter\Storage\Repository;
 use App\Core\Filesystem\Filesystem;
 use App\Domain\Model\Vault;
 use App\Domain\Port\Storage\VaultRepositoryInterface;
-use App\InputOutput;
 use Illuminate\Contracts\Config\Repository;
 
 class VaultRepository implements VaultRepositoryInterface
@@ -16,11 +15,9 @@ class VaultRepository implements VaultRepositoryInterface
     public function __construct(
         protected Filesystem $filesystem,
         private Repository   $config,
-        private InputOutput  $inputOutput
     ) {
         $this->vaultsStoragePath = $this->config->get('vaultsStoragePath');
         $this->vaultLogsPath = $this->config->get('vaultsLogs');
-
     }
 
 
@@ -30,7 +27,7 @@ class VaultRepository implements VaultRepositoryInterface
         $vaultPath = $this->vaultsStoragePath . $vaultName . '.json';
 
         if ($this->isVaultExist($vaultPath)) {
-            $this->inputOutput->writeln("Vault {$vaultName} already exists");
+            throw new \Exception("Vault already exists");
         }
 
         $attributes['path'] = $vaultPath;
@@ -38,8 +35,6 @@ class VaultRepository implements VaultRepositoryInterface
 
         $this->filesystem->put($vaultPath, '');
         $this->updateVaultLogs($attributes);
-
-        $this->inputOutput->writeln("Vault {$vaultName} created successfully");
 
         return $vault;
     }
@@ -71,7 +66,6 @@ class VaultRepository implements VaultRepositoryInterface
         }
 
         $this->filesystem->put($this->vaultLogsPath, json_encode($vaultsData, JSON_PRETTY_PRINT));
-        $this->inputOutput->writeln('Vault ' . $attributes['name'] . ' updated successfully');
 
         return true;
     }
@@ -82,8 +76,7 @@ class VaultRepository implements VaultRepositoryInterface
     public function delete(int|string $id): bool
     {
         if (!$this->isVaultExist($id.'.json')) {
-            $this->inputOutput->writeln('Vault ' . $id . ' does not exist');
-            return false;
+            throw new \Exception('Vault does not exist');
         }
 
         $this->filesystem->delete($this->vaultsStoragePath . $id . '.json');
@@ -95,8 +88,6 @@ class VaultRepository implements VaultRepositoryInterface
         });
 
         $this->filesystem->put($this->vaultLogsPath, json_encode($vaultsData, JSON_PRETTY_PRINT));
-
-        $this->inputOutput->writeln('Vault' . $id . ' deleted successfully');
 
         return true;
     }
@@ -110,9 +101,7 @@ class VaultRepository implements VaultRepositoryInterface
             throw new \Exception('Vault does not exist');
         }
 
-        $this->filesystem->get($this->vaultsStoragePath . $id);
-
-        return new \stdClass();
+        return $this->filesystem->get($this->vaultsStoragePath . $id);
     }
 
     public function findAll(): array
