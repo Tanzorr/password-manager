@@ -1,15 +1,18 @@
 <?php
 
-namespace App;
+namespace App\Adapter\Console\Controller;
 
+use App\AskHelper;
+use App\InputOutput;
 use App\Model\Password;
 use App\Model\Vault;
 use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
-class PasswordManager
+class PasswordController
 {
     public function __construct(
         private InputOutput $io,
