@@ -19,4 +19,3 @@ class Vault extends Model
       'updated_at' => null,
     ];
 }
-

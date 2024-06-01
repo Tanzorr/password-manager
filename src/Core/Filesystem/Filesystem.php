@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Core\Filesystem;
 
 class Filesystem
 {
@@ -42,4 +42,3 @@ class Filesystem
         return true;
     }
 }
-

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Core\Cryptography;
 
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;

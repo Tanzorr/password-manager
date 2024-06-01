@@ -24,4 +24,3 @@ class Password extends Model
         'value' => null,
     ];
 }
-

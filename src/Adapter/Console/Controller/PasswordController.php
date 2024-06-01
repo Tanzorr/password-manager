@@ -2,7 +2,6 @@
 
 namespace App\Adapter\Console\Controller;
 
-use App\AskHelper;
 use App\Domain\Model\Password;
 use App\Domain\Model\Vault;
 use App\InputOutput;
@@ -16,7 +15,6 @@ class PasswordController
 {
     public function __construct(
         private InputOutput $io,
-        private AskHelper   $askHelper,
         private Repository  $config
     ) {
     }
@@ -45,8 +43,8 @@ class PasswordController
     private function addPassword(): void
     {
         Password::create([
-            'name' => $this->askHelper->askPasswordName(),
-            'value' => $this->askHelper->askPasswordValue()
+            'name' => $this->askForPasswordName(),
+            'value' => $this->askForPasswordValue()
         ]);
 
         Vault::update([
@@ -62,7 +60,20 @@ class PasswordController
      */
     private function showPassword(): void
     {
-        $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
+        $password = Password::find($this->askForPasswordName());
+        # FIXME: что произойдёт если пароля нет?
+        $this->io->writeln($password->value);
+    }
+
+    public function askForPasswordValue(): string
+    {
+        return $this->io->expect("Enter password value:");
+    }
+
+
+    public function askForPasswordName(): string
+    {
+        return $this->io->expect("Enter password name:");
     }
 
     /**
@@ -70,7 +81,7 @@ class PasswordController
      */
     private function deletePassword(): void
     {
-        if (Password::delete($passwordName = $this->askHelper->askPasswordName())) {
+        if (Password::delete($passwordName = $this->askForPasswordName())) {
             $this->io->writeln("$passwordName Password deleted.");
             Vault::update([
                 'name' => $this->config->get('activeVault'),
@@ -86,8 +97,8 @@ class PasswordController
     private function changePassword(): void
     {
         Password::update([
-            'name' => $this->askHelper->askPasswordName(),
-            'value' => $this->askHelper->askPasswordValue()
+            'name' => $this->askForPasswordName(),
+            'value' => $this->askForPasswordValue(),
         ]);
 
         Vault::update([

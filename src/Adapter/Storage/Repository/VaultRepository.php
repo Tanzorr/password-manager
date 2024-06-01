@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Repository;
+namespace App\Adapter\Storage\Repository;
 
+use App\Core\Filesystem\Filesystem;
 use App\Domain\Model\Vault;
-use App\Filesystem;
+use App\Domain\Port\Storage\VaultRepositoryInterface;
 use App\InputOutput;
 use Illuminate\Contracts\Config\Repository;
 
-class VaultRepository implements RepositoryInterface
+class VaultRepository implements VaultRepositoryInterface
 {
     protected mixed $vaultsStoragePath;
     protected mixed $vaultLogsPath;

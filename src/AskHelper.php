@@ -8,24 +8,11 @@ class AskHelper
     {
     }
 
-    public function askPasswordName(): string
+    # методы формата askSomethingName принадлежат конкретному контексту, их лучше иметь в том месте
+    # где ты пишешь связанный с ними код, тем более что сами методы между собой отличаются минимально
+    private function prompt(string $fieldName): string
     {
-        return $this->askField('password name');
-    }
-
-    public function askPasswordValue(): string
-    {
-        return $this->askField('password value');
-    }
-
-    public function askVaultName(): string
-    {
-        return $this->askField('vault name');
-    }
-
-    private function askField(string $fieldName): string
-    {
-        $fieldVal = $this->io->expect("Enter $fieldName: ");
+        $fieldVal = $this->io->expect($fieldName);
 
         return $fieldVal ?: $this->retryField($fieldName);
     }
@@ -34,7 +21,6 @@ class AskHelper
     {
         $this->io->writeln("Field $fieldName is empty.");
 
-        return $this->askField($fieldName);
+        return $this->prompt($fieldName);
     }
 }
-

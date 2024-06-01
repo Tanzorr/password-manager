@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Core\Filesystem;
 
 interface FilesystemInterface
 {
@@ -12,4 +12,3 @@ interface FilesystemInterface
 
     public function delete(string $path): bool;
 }
-

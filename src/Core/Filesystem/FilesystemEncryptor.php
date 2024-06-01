@@ -1,6 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Core\Filesystem;
+
+use App\Core\Cryptography\Encryptor;
+use App\Core\Filesystem\FilesystemInterface;
 
 class FilesystemEncryptor implements FilesystemInterface
 {

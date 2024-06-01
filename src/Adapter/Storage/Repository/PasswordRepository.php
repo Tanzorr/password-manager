@@ -1,13 +1,14 @@
 <?php
 
-namespace App\Repository;
+namespace App\Adapter\Storage\Repository;
 
+use App\Core\Filesystem\FilesystemEncryptor;
 use App\Domain\Model\Password;
-use App\FilesystemEncryptor;
+use App\Domain\Port\Storage\PasswordRepositoryInterface;
 use Exception;
 use Illuminate\Contracts\Config\Repository;
 
-class PasswordRepository implements RepositoryInterface
+class PasswordRepository implements PasswordRepositoryInterface
 {
     protected string $storagePath;
 

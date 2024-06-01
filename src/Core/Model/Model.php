@@ -48,7 +48,10 @@ abstract class Model
         $modelName = end($segments);
 
         $container = Container::getInstance();
-        $modelRepository = $container->get("App\\Repository\\{$modelName}Repository");
+        // Стоит отметить что подход с динамическим определением репозитория очень ненадёжен и лучше это делать посредством класса,
+        // который ответственнен за это. В дальнейшем мы уберём этот функционал и не будем использовать магические методы для вызова методов репозитория
+        // потому что такие вызовы возлагают на модель слишком много ответственности, а такие вещи всегда тяжело содерждать
+        $modelRepository = $container->get("App\\Adapter\\Storage\\Repository\\{$modelName}Repository");
 
         return $modelRepository->$name(...$arguments);
     }

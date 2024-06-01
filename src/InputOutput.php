@@ -9,10 +9,26 @@ class InputOutput
         echo $text . "\n";
     }
 
-    public function expect(string $text): string
+    public function write(string $text): void
     {
-        echo $text . "\n";
-        return trim(readline());
+        echo $text;
+    }
+
+    public function expect(string $text, bool $required = false): string
+    {
+        $this->write($text);
+        $value = trim(readline());
+        if(!$value) {
+            $this->clearScreen();
+            $this->io->writeln("Value cannot be empty.");
+            $this->expect($text, $required);
+        }
+
+        return $value;
+    }
+
+    private function clearScreen(): void
+    {
+        exec('clear');
     }
 }
-

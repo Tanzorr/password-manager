@@ -2,7 +2,6 @@
 
 namespace App\Adapter\Console\Controller;
 
-use App\AskHelper;
 use App\Domain\Model\Vault;
 use App\InputOutput;
 use Illuminate\Contracts\Config\Repository;
@@ -15,7 +14,6 @@ use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 class VaultController
 {
     public function __construct(
-        private AskHelper       $askHelper,
         private Repository      $config,
         // тут така штука что вложеность одного "менеджера" в другой приводит к тому что их поведение отображения страдает
         // потому легче будет вынести часть логики их работы в отдельные сервисы  домена (domain),
@@ -100,14 +98,14 @@ class VaultController
     public function addVault(): void
     {
         Vault::create([
-            'name' => $this->askHelper->askVaultName(),
+            'name' => $this->io->expect("Vault:"),
             'created_at' => date('Y-m-d H:i:s')
         ]);
     }
 
     public function deleteVault(): void
     {
-        Vault::delete($this->askHelper->askVaultName());
+        Vault::delete($this->io->expect("Vault:"));
     }
 
     #[NoReturn] private function logout(): void
