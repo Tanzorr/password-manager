@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 class InputOutput
 {
     public function writeln(string $text): void
@@ -14,3 +15,4 @@ class InputOutput
         return trim(readline());
     }
 }
+

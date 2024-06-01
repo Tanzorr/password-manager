@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Domain\Model;
+
+use App\Core\Model\Model;
 
 /**
  * @property string $name
@@ -8,7 +10,6 @@ namespace App\Model;
  */
 class Password extends Model
 {
-
     public function getHashedPassword(): string
     {
         return password_hash($this->attributes['value'], PASSWORD_DEFAULT) ?? '';
@@ -23,3 +24,4 @@ class Password extends Model
         'value' => null,
     ];
 }
+

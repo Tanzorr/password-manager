@@ -2,14 +2,12 @@
 
 namespace App;
 
-
 class FilesystemEncryptor implements FilesystemInterface
 {
     public function __construct(
         protected Filesystem $filesystem,
         protected Encryptor  $encryptor
-    )
-    {
+    ) {
     }
 
     public function exists(string $path): bool
@@ -40,3 +38,4 @@ class FilesystemEncryptor implements FilesystemInterface
         return $this->filesystem->delete($path);
     }
 }
+

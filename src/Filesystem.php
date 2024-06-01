@@ -1,6 +1,7 @@
 <?php
 
 namespace App;
+
 class Filesystem
 {
     public function get(string $storagePath): string
@@ -28,7 +29,7 @@ class Filesystem
     }
     public function getAllFiles(string $storagePath): array
     {
-        if(scandir($storagePath) === false){
+        if(scandir($storagePath) === false) {
             return [];
         }
 
@@ -37,7 +38,8 @@ class Filesystem
 
     public function createFile(string $storagePath): bool
     {
-        mkdir($storagePath,0777, true);
+        mkdir($storagePath, 0777, true);
         return true;
     }
 }
+

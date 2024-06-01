@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-
 interface RepositoryInterface
 {
     public function create(array $attributes): object;

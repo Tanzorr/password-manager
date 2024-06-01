@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Core\Model;
 
 use Illuminate\Container\Container;
 
@@ -11,8 +11,6 @@ use Illuminate\Container\Container;
  * @method static bool delete(int|string $id)
  * @method static static[]findAll()
  */
-
-
 abstract class Model
 {
     public function __construct(private array $attributes = [])
@@ -63,3 +61,4 @@ abstract class Model
         return $newModel->$name(...$arguments);
     }
 }
+

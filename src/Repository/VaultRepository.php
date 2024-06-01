@@ -2,10 +2,9 @@
 
 namespace App\Repository;
 
-
+use App\Domain\Model\Vault;
 use App\Filesystem;
 use App\InputOutput;
-use App\Model\Vault;
 use Illuminate\Contracts\Config\Repository;
 
 class VaultRepository implements RepositoryInterface
@@ -17,8 +16,7 @@ class VaultRepository implements RepositoryInterface
         protected Filesystem $filesystem,
         private Repository   $config,
         private InputOutput  $inputOutput
-    )
-    {
+    ) {
         $this->vaultsStoragePath = $this->config->get('vaultsStoragePath');
         $this->vaultLogsPath = $this->config->get('vaultsLogs');
 
@@ -59,7 +57,7 @@ class VaultRepository implements RepositoryInterface
      */
     public function update(array $attributes): bool
     {
-        if (!$this->isVaultExist($attributes['name'].'.json')&& !$this->isVaultExist($attributes['name'])) {
+        if (!$this->isVaultExist($attributes['name'].'.json') && !$this->isVaultExist($attributes['name'])) {
             throw new \Exception('Vault does not exist');
         }
 

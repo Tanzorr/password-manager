@@ -3,9 +3,9 @@
 namespace App\Adapter\Console\Controller;
 
 use App\AskHelper;
+use App\Domain\Model\Password;
+use App\Domain\Model\Vault;
 use App\InputOutput;
-use App\Model\Password;
-use App\Model\Vault;
 use Exception;
 use JetBrains\PhpStorm\NoReturn;
 use Illuminate\Contracts\Config\Repository;
@@ -18,8 +18,7 @@ class PasswordController
         private InputOutput $io,
         private AskHelper   $askHelper,
         private Repository  $config
-    )
-    {
+    ) {
     }
 
     /**

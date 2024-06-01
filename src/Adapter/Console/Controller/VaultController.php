@@ -3,8 +3,8 @@
 namespace App\Adapter\Console\Controller;
 
 use App\AskHelper;
+use App\Domain\Model\Vault;
 use App\InputOutput;
-use App\Model\Vault;
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
@@ -115,4 +115,3 @@ class VaultController
         exit();
     }
 }
-
