@@ -1,2 +1,2 @@
-parameters:
-     storagePath: "./passwords.json"
+FilesystemInterface: 'App\FilesystemEncryptor',
+                       RepositoryInterface: 'App\Repository'

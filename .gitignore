@@ -4,5 +4,6 @@
 ./passwords.json
 config.php
 passwords.json
-
+/logs/
 /vendor/
+/vaults/

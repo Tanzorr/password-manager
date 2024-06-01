@@ -2,14 +2,19 @@
 
 namespace App;
 
+use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 
 
 
 class Encryptor
 {
-    #[NoReturn] public function __construct(private string $encryptionKey = '')
+    private string $encryptionKey = '';
+     public function __construct(
+        private Repository $config
+     )
     {
+        $this->encryptionKey = $this->config->get('encryptionKey');
     }
 
     public function encrypt(string $string): string

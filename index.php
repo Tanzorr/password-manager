@@ -1,39 +1,27 @@
 <?php
-namespace App;
+use App\InputOutput;
+use App\VaultManger;
+use Illuminate\Container\Container;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;
 
-
-global $io;
-
-use ReflectionException;
 
 require_once __DIR__ . "/vendor/autoload.php";
 
+$container = Container::getInstance();
 
-$container = new Container();
+$container->singleton(ConfigRepositoryInterface::class, function () {
+    $configValues = require_once __DIR__ . '/config/app.php';
+    return new Repository($configValues);
+});
 
-try {
-    $io = $container->get(InputOutput::class);
-} catch (ReflectionException $e) {
-    $io->writeln($e->getMessage());
-}
+$io = $container->get(InputOutput::class);
+$encryptionKey = 'test';
 
-$encryptionKey = $io->expect("Enter encryption name: ");
-
-if($encryptionKey === ''){
-    $io->writeln("Encryption name is empty.");
-    exit;
-}
-
-$container->setParameter('encryptionKey', $encryptionKey);
-try {
-    $container->load('./service.yaml');
-} catch (\Exception $e) {
-    $io->writeln($e->getMessage());
-    exit;
-}
+$container->get(ConfigRepositoryInterface::class)->set('encryptionKey', $encryptionKey);
 
 try {
-    $passwordManager = $container->build(PasswordManager::class);
+    $passwordManager = $container->get(VaultManger::class);
     $passwordManager->run();
 } catch (ReflectionException $e) {
     $io->writeln($e->getMessage());
