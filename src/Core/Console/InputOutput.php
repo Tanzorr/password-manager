@@ -4,7 +4,7 @@ namespace App\Core\Console;
 
 class InputOutput
 {
-    public function writeln(string $text): void
+    public function writeln(string $text = ''): void
     {
         echo $text . "\n";
     }
@@ -18,6 +18,7 @@ class InputOutput
     {
         $this->write($text);
         $value = trim(readline());
+        $this->writeln();
         if(!$value) {
             $this->clearScreen();
             $this->io->writeln("Value cannot be empty.");
