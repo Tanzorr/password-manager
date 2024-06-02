@@ -1,8 +1,9 @@
 <?php
 
-namespace App;
+namespace App\Adapter\Console\Controller;
 
-use App\Model\Vault;
+use App\Core\Console\InputOutput;
+use App\Domain\Model\Vault;
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
@@ -10,15 +11,16 @@ use PhpSchool\CliMenu\CliMenu;
 use DomainException;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
-class VaultManger
+class VaultController
 {
     public function __construct(
-        private AskHelper       $askHelper,
         private Repository      $config,
-        private PasswordManager $passwordManager,
+        // тут така штука что вложеность одного "менеджера" в другой приводит к тому что их поведение отображения страдает
+        // потому легче будет вынести часть логики их работы в отдельные сервисы  домена (domain),
+        // тут мы потихонечку будем вводить такое понятие как DDD (domain driven design) и hexagonal architecture нам в этом поможет
+        private PasswordController $passwordController,
         private InputOutput     $io,
-    )
-    {
+    ) {
     }
 
     public function run(): void
@@ -53,13 +55,13 @@ class VaultManger
     public function selectVault(): void
     {
         $vaults = array_diff(Vault::findAll(), ['.', '..']);
-        if(count($vaults) === 0){
+        if(count($vaults) === 0) {
             throw new DomainException("No vaults found");
         }
         $menuBuilder = (new CliMenuBuilder())->setTitle('Select vaults:');
 
         array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault, $menu));
+            $menuBuilder->addItem($vault, fn (CliMenu $menu) => $this->selectVaultItem($vault, $menu));
         });
 
         $menuBuilder->build()->open();
@@ -73,14 +75,14 @@ class VaultManger
         $this->io->writeln("Selected vault: $vault");
         $this->setVaultConfig($vault);
         $this->setEncryptionKey();
-        $this->passwordManager->showMenu();
+        $this->passwordController->showMenu();
         $menu->close();
     }
 
     private function setVaultConfig(string $vault): void
     {
         $this->config->set('storagePath', 'vaults/' . $vault);
-        $this->config->set('activeVault',  $vault);
+        $this->config->set('activeVault', $vault);
     }
 
     private function setEncryptionKey(): void
@@ -95,15 +97,22 @@ class VaultManger
 
     public function addVault(): void
     {
-        Vault::create([
-            'name' => $this->askHelper->askVaultName(),
+        $vault = Vault::create([
+            'name' => $vaultName = $this->io->expect("Vault:"),
             'created_at' => date('Y-m-d H:i:s')
         ]);
+
+        $this->inputOutput->writeln("Vault {$vaultName} created successfully");
     }
 
     public function deleteVault(): void
     {
-        Vault::delete($this->askHelper->askVaultName());
+        if(Vault::delete($id = $this->io->expect("Vault:"))) {
+            $this->inputOutput->writeln('Vault' . $id . ' deleted successfully');
+        } else {
+            $this->inputOutput->writeln('Vault ' . $id . ' does not exist');
+
+        }
     }
 
     #[NoReturn] private function logout(): void

@@ -1,22 +1,22 @@
 <?php
 
-namespace App;
+namespace App\Adapter\Console\Controller;
 
-use App\Model\Password;
-use App\Model\Vault;
+use App\Core\Console\InputOutput;
+use App\Domain\Model\Password;
+use App\Domain\Model\Vault;
 use Exception;
+use JetBrains\PhpStorm\NoReturn;
 use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
-class PasswordManager
+class PasswordController
 {
     public function __construct(
         private InputOutput $io,
-        private AskHelper   $askHelper,
         private Repository  $config
-    )
-    {
+    ) {
     }
 
     /**
@@ -43,8 +43,8 @@ class PasswordManager
     private function addPassword(): void
     {
         Password::create([
-            'name' => $this->askHelper->askPasswordName(),
-            'value' => $this->askHelper->askPasswordValue()
+            'name' => $this->askForPasswordName(),
+            'value' => $this->askForPasswordValue()
         ]);
 
         Vault::update([
@@ -60,7 +60,20 @@ class PasswordManager
      */
     private function showPassword(): void
     {
-        $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
+        $password = Password::find($this->askForPasswordName());
+        # FIXME: что произойдёт если пароля нет?
+        $this->io->writeln($password->value);
+    }
+
+    public function askForPasswordValue(): string
+    {
+        return $this->io->expect("Enter password value:");
+    }
+
+
+    public function askForPasswordName(): string
+    {
+        return $this->io->expect("Enter password name:");
     }
 
     /**
@@ -68,7 +81,7 @@ class PasswordManager
      */
     private function deletePassword(): void
     {
-        if (Password::delete($passwordName = $this->askHelper->askPasswordName())) {
+        if (Password::delete($passwordName = $this->askForPasswordName())) {
             $this->io->writeln("$passwordName Password deleted.");
             Vault::update([
                 'name' => $this->config->get('activeVault'),
@@ -84,8 +97,8 @@ class PasswordManager
     private function changePassword(): void
     {
         Password::update([
-            'name' => $this->askHelper->askPasswordName(),
-            'value' => $this->askHelper->askPasswordValue()
+            'name' => $this->askForPasswordName(),
+            'value' => $this->askForPasswordValue(),
         ]);
 
         Vault::update([

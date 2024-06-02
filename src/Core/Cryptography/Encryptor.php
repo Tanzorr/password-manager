@@ -1,19 +1,16 @@
 <?php
 
-namespace App;
+namespace App\Core\Cryptography;
 
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 
-
-
 class Encryptor
 {
     private string $encryptionKey = '';
-     public function __construct(
+    public function __construct(
         private Repository $config
-     )
-    {
+    ) {
         $this->encryptionKey = $this->config->get('encryptionKey');
     }
 
