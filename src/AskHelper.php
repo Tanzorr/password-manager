@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Core\Console\InputOutput;
+
 class AskHelper
 {
     public function __construct(private InputOutput $io)

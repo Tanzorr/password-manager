@@ -1,10 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Core\Cryptograhy;
 
 use Illuminate\Contracts\Config\Repository;
-use JetBrains\PhpStorm\NoReturn;
-
 
 
 class Encryptor

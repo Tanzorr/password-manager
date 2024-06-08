@@ -1,20 +1,21 @@
 <?php
 
-namespace App;
+namespace App\Adapter\Console;
 
-use App\Model\Password;
-use App\Model\Vault;
+use App\AskHelper;
+use App\Core\Console\InputOutput;
+use App\Domain\Model\Password;
+use App\Domain\Model\Vault;
+use App\NoReturn;
 use Exception;
-use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
-class PasswordManager
+class PasswordController
 {
     public function __construct(
         private InputOutput $io,
-        private AskHelper   $askHelper,
-        private Repository  $config
+        private AskHelper   $askHelper
     )
     {
     }
@@ -61,6 +62,18 @@ class PasswordManager
     private function showPassword(): void
     {
         $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
+    }
+
+
+    public function askForPasswordValue(): string
+    {
+        return $this->io->expect("Enter password value:");
+    }
+
+
+    public function askForPasswordName(): string
+    {
+        return $this->io->expect("Enter password name:");
     }
 
     /**

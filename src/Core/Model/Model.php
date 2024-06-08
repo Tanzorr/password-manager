@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Model;
+namespace App\Core\Model;
 
 use Illuminate\Container\Container;
 

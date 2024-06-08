@@ -7,12 +7,12 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;
 
 
-require_once __DIR__ . "/vendor/autoload.php";
+require_once __DIR__ . "/../vendor/autoload.php";
 
 $container = Container::getInstance();
 
 $container->singleton(ConfigRepositoryInterface::class, function () {
-    $configValues = require_once __DIR__ . '/config/app.php';
+    $configValues = require_once __DIR__ . '/../config/app.php';
     return new Repository($configValues);
 });
 

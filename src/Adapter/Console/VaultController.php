@@ -1,22 +1,22 @@
 <?php
 
-namespace App;
+namespace App\Adapter\Console;
 
-use App\Model\Vault;
+use App\Core\Console\InputOutput;
+use App\Domain\Model\Vault;
+use DomainException;
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
-use DomainException;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
-class VaultManger
+class VaultController
 {
     public function __construct(
-        private AskHelper       $askHelper,
-        private Repository      $config,
-        private PasswordManager $passwordManager,
-        private InputOutput     $io,
+        private Repository         $config,
+        private PasswordController $passwordManager,
+        private InputOutput        $io,
     )
     {
     }
@@ -38,13 +38,50 @@ class VaultManger
 
     public function showVaultsMenu(): void
     {
-        $menu = (new CliMenuBuilder())
-            ->addItem("Select vault", $this->selectVault(...))
-            ->addItem("Add vault", $this->addVault(...))
-            ->addItem("Delete vault", $this->deleteVault(...))
-            ->build();
+       $menu = (new CliMenuBuilder())
+                ->setTitle("Menu actions:")
+                ->addItem("Add vault", fn() => $this->addVault())
+                ->addItem("Delete vault", fn() => $this->deleteVault())
+                ->addItem("Select vault", fn() => $this->selectVault())
+                ->addItem("Logout", fn() => $this->logout())
+                ->build();
 
-        $menu->open();
+            $menu->open();
+    }
+
+    private function setVaultConfig(string $vault): void
+    {
+        $this->config->set('storagePath', 'vaults/' . $vault);
+        $this->config->set('activeVault',  $vault);
+    }
+
+    private function setEncryptionKey(): void
+    {
+        $encryptionKey = $this->io->expect("Enter encryption name: ");
+        if ($encryptionKey === '') {
+            $this->io->writeln("Encryption name is empty.");
+            exit;
+        }
+        $this->config->set('encryptionKey', $encryptionKey);
+    }
+
+    public function addVault(): void
+    {
+        Vault::create([
+            'name' => $vaultName = $this->io->expect("Enter vault name: "),
+            'created_at' => date('Y-m-d H:i:s')
+        ]);
+
+        $this->io->writeln("Vault $vaultName created successfully");
+    }
+
+    public function deleteVault(): void
+    {
+       if(Vault::delete($vaultName = $this->io->expect("Enter vault name: "))){
+           $this->io->writeln("Vault $vaultName deleted successfully");
+       } else {
+           $this->io->writeln("Vault $vaultName not found");
+       }
     }
 
     /**
@@ -76,36 +113,6 @@ class VaultManger
         $this->passwordManager->showMenu();
         $menu->close();
     }
-
-    private function setVaultConfig(string $vault): void
-    {
-        $this->config->set('storagePath', 'vaults/' . $vault);
-        $this->config->set('activeVault',  $vault);
-    }
-
-    private function setEncryptionKey(): void
-    {
-        $encryptionKey = $this->io->expect("Enter encryption name: ");
-        if ($encryptionKey === '') {
-            $this->io->writeln("Encryption name is empty.");
-            exit;
-        }
-        $this->config->set('encryptionKey', $encryptionKey);
-    }
-
-    public function addVault(): void
-    {
-        Vault::create([
-            'name' => $this->askHelper->askVaultName(),
-            'created_at' => date('Y-m-d H:i:s')
-        ]);
-    }
-
-    public function deleteVault(): void
-    {
-        Vault::delete($this->askHelper->askVaultName());
-    }
-
     #[NoReturn] private function logout(): void
     {
         exit();

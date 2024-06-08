@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Core\Filesystem;
 class Filesystem
 {
     public function get(string $storagePath): string

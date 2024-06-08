@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Domain\Model;
+
+use App\Core\Model\Model;
 
 /**
  * @property string $name

@@ -1,7 +1,7 @@
 <?php
 
-namespace App\Model;
-use Exception;
+namespace App\Domain\Model;
+use App\Core\Model\Model;
 
 /**
  * @property string $name
