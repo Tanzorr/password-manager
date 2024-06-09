@@ -8,6 +8,7 @@ use App\Domain\Model\Password;
 use App\Domain\Model\Vault;
 use App\NoReturn;
 use Exception;
+use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
@@ -15,7 +16,8 @@ class PasswordController
 {
     public function __construct(
         private InputOutput $io,
-        private AskHelper   $askHelper
+        private AskHelper   $askHelper,
+        private Repository  $config
     )
     {
     }

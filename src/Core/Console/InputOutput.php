@@ -17,7 +17,7 @@ class InputOutput
     {
         $this->write($text);
         $value = trim(readline());
-        $this->writeln();
+        $this->writeln($value);
         if(!$value){
             $this->clearScreen();
             $this->writeln("Value is required");

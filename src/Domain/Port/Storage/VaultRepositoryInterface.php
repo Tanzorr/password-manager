@@ -6,5 +6,4 @@ use App\Core\Storage\Repository\RepositoryInterface;
 
 interface VaultRepositoryInterface extends RepositoryInterface
 {
-
 }

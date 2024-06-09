@@ -3,7 +3,6 @@
 namespace App\Adapter\Storage;
 
 
-use App\Core\Console\InputOutput;
 use App\Core\Filesystem\Filesystem;
 use App\Core\Storage\Repository\RepositoryInterface;
 use App\Domain\Model\Vault;

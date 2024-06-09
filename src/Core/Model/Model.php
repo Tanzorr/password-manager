@@ -50,7 +50,7 @@ abstract class Model
         $modelName = end($segments);
 
         $container = Container::getInstance();
-        $modelRepository = $container->get("App\\Repository\\{$modelName}Repository");
+        $modelRepository = $container->get("App\\Adapter\\Storage\\{$modelName}Repository");
 
         return $modelRepository->$name(...$arguments);
     }
