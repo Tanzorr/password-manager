@@ -4,8 +4,10 @@ namespace App\Adapter\Console\Controller;
 
 use App\Core\Console\InputOutput;
 use App\Domain\Model\Vault;
+use App\Domain\Query\GetVaultListQuery;
 use Illuminate\Contracts\Config\Repository;
 use JetBrains\PhpStorm\NoReturn;
+use League\Tactician\CommandBus;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
 use DomainException;
@@ -20,6 +22,7 @@ class VaultController
         // тут мы потихонечку будем вводить такое понятие как DDD (domain driven design) и hexagonal architecture нам в этом поможет
         private PasswordController $passwordController,
         private InputOutput     $io,
+        private CommandBus $bus
     ) {
     }
 
@@ -54,7 +57,9 @@ class VaultController
      */
     public function selectVault(): void
     {
-        $vaults = array_diff(Vault::findAll(), ['.', '..']);
+        $vaults = $this->bus->handle(new GetVaultListQuery());
+
+        $vaults = array_diff($vaults, ['.', '..']);
         if(count($vaults) === 0) {
             throw new DomainException("No vaults found");
         }

@@ -52,6 +52,7 @@ class PasswordController
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
+
         $this->showMenu();
     }
 
