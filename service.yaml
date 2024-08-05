@@ -1,2 +1,2 @@
-FilesystemInterface: 'App\Core\Filesystem',
-                       RepositoryInterface: 'App\Adapter\Storage'
+FilesystemInterface: 'App\Core\Filesystem\FilesystemEncryptor'
+RepositoryInterface: 'App\Core\Storage\Repository\Repository'

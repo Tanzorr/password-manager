@@ -19,6 +19,7 @@
     "illuminate/container": "^11.3",
     "php-school/cli-menu": "^4.3",
     "illuminate/config": "^11.5",
-    "symfony/string": "^7.0"
+    "symfony/string": "^7.0",
+    "league/tactician": "*"
   }
 }

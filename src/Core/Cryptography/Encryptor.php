@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Core\Cryptograhy;
+namespace App\Core\Cryptography;
 
 use Illuminate\Contracts\Config\Repository;
 

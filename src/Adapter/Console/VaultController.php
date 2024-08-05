@@ -6,19 +6,20 @@ use App\Core\Console\InputOutput;
 use App\Domain\Model\Vault;
 use DomainException;
 use Illuminate\Contracts\Config\Repository;
-use JetBrains\PhpStorm\NoReturn;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 use PhpSchool\CliMenu\CliMenu;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class VaultController
 {
+    protected $config;
     public function __construct(
-        private Repository         $config,
+        Repository         $config,
         private PasswordController $passwordManager,
         private InputOutput        $io,
     )
     {
+        $this->config = $config;
     }
 
     public function run(): void
@@ -40,13 +41,42 @@ class VaultController
     {
        $menu = (new CliMenuBuilder())
                 ->setTitle("Menu actions:")
+                ->addItem("Select vault", fn() => $this->selectVault())
                 ->addItem("Add vault", fn() => $this->addVault())
                 ->addItem("Delete vault", fn() => $this->deleteVault())
-                ->addItem("Select vault", fn() => $this->selectVault())
-                ->addItem("Logout", fn() => $this->logout())
                 ->build();
 
             $menu->open();
+    }
+
+    /**
+     * @throws InvalidTerminalException
+     */
+    public function selectVault(): void
+    {
+        $vaults = array_diff(Vault::findAll(), ['.', '..']);
+        if(count($vaults) === 0){
+            throw new DomainException("No vaults found");
+        }
+        $menuBuilder = (new CliMenuBuilder())->setTitle('Select vaults:');
+
+        array_walk($vaults, function ($vault) use ($menuBuilder) {
+            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault, $menu));
+        });
+
+        $menuBuilder->build()->open();
+    }
+
+    /**
+     * @throws InvalidTerminalException
+     */
+    private function selectVaultItem(string $vault, CliMenu $menu): void
+    {
+        $this->io->writeln("Selected vault: $vault");
+        $this->setVaultConfig($vault);
+        $this->setEncryptionKey();
+        $this->passwordManager->showMenu();
+        $menu->close();
     }
 
     private function setVaultConfig(string $vault): void
@@ -82,39 +112,5 @@ class VaultController
        } else {
            $this->io->writeln("Vault $vaultName not found");
        }
-    }
-
-    /**
-     * @throws InvalidTerminalException
-     */
-    public function selectVault(): void
-    {
-        $vaults = array_diff(Vault::findAll(), ['.', '..']);
-        if(count($vaults) === 0){
-            throw new DomainException("No vaults found");
-        }
-        $menuBuilder = (new CliMenuBuilder())->setTitle('Select vaults:');
-
-        array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault, $menu));
-        });
-
-        $menuBuilder->build()->open();
-    }
-
-    /**
-     * @throws InvalidTerminalException
-     */
-    private function selectVaultItem(string $vault, CliMenu $menu): void
-    {
-        $this->io->writeln("Selected vault: $vault");
-        $this->setVaultConfig($vault);
-        $this->setEncryptionKey();
-        $this->passwordManager->showMenu();
-        $menu->close();
-    }
-    #[NoReturn] private function logout(): void
-    {
-        exit();
     }
 }

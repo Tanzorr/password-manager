@@ -3,7 +3,7 @@
 namespace App\Core\Filesystem;
 
 
-use App\Core\Cryptograhy\Encryptor;
+use App\Core\Cryptography\Encryptor;
 
 class FilesystemEncryptor implements FilesystemInterface
 {
