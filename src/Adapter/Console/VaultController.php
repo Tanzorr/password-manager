@@ -29,6 +29,8 @@ class VaultController
         while (true) {
             try {
                 $this->showVaultsMenu();
+                $this->io->writeln("====================");
+                $this->selectVault();
             } catch (DomainException $error) {
                 $this->io->writeln("====================");
                 $this->io->writeln("[ERROR]{$error->getMessage()}");
@@ -47,6 +49,7 @@ class VaultController
                 ->build();
 
             $menu->open();
+
     }
 
     /**
@@ -75,9 +78,36 @@ class VaultController
         $this->io->writeln("Selected vault: $vault");
         $this->setVaultConfig($vault);
         $this->setEncryptionKey();
-        $this->passwordManager->showMenu();
+        $this->editVaultName($vault);
+
+        $menu = (new CliMenuBuilder())
+            ->addItem("edit Vault", fn() => $this->editVaultName($vault))
+            ->addItem("add password", fn() => $this->passwordManager->addPassword())
+          //  ->addItem("password list", fn() => $this->displayAllPasswords())
+            ->build();
+
+        $menu->open();
 
         $menu->close();
+    }
+
+    private function displayAllPasswords()
+    {
+        $passwords = $this->passwordManager->getAllPasswords();
+        var_dump($passwords);
+        exit();
+
+        if(count($passwords) === 0){
+            throw new DomainException("No passwords found");
+        }
+
+        $menuBuilder = (new CliMenuBuilder())->setTitle('Passwords:');
+
+//        array_walk($passwords, function ($password) use ($menuBuilder) {
+//            $menuBuilder->addItem($password, fn(CliMenu $menu) =>  $this->io->write($password));
+//        });
+
+        $menuBuilder->build()->open();
     }
 
     private function setVaultConfig(string $vault): void
@@ -86,9 +116,16 @@ class VaultController
         $this->config->set('activeVault',  $vault);
     }
 
-    private function editVaultName(string $vault): void()
+    private function editVaultName(string $vault): void
     {
+        $this->io->writeln("Edit vault: $vault");
+    }
 
+    /**
+     * @throws \Exception
+     */
+    private function addPassword():void{
+        $this->passwordManager->addPassword();
     }
 
     private function setEncryptionKey(): void

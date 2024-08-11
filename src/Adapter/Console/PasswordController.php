@@ -43,7 +43,7 @@ class PasswordController
     /**
      * @throws Exception
      */
-    private function addPassword(): void
+    public function addPassword(): void
     {
         Password::create([
             'name' => $this->askHelper->askPasswordName(),
@@ -111,10 +111,15 @@ class PasswordController
         $this->showMenu();
     }
 
+    public function getAllPasswords():array
+    {
+      return  Password::findAll();
+    }
+
     /**
      * @throws Exception
      */
-    private function showAllPasswords(): void
+    public function showAllPasswords(): void
     {
         $passwords = Password::findAll();
         $this->io->writeln("===============");
