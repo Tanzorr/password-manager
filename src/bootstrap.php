@@ -5,7 +5,6 @@ use App\Domain\Query\GetVaultListQuery;
 use Illuminate\Config\Repository;
 use Illuminate\Container\Container;
 use League\Tactician\Setup\QuickStart;
-use Psr\Container\ContainerInterface;
 use Illuminate\Contracts\Config\Repository as ConfigRepositoryInterface;
 use League\Tactician\CommandBus;
 

@@ -76,6 +76,7 @@ class VaultController
         $this->setVaultConfig($vault);
         $this->setEncryptionKey();
         $this->passwordManager->showMenu();
+
         $menu->close();
     }
 
@@ -83,6 +84,11 @@ class VaultController
     {
         $this->config->set('storagePath', 'vaults/' . $vault);
         $this->config->set('activeVault',  $vault);
+    }
+
+    private function editVaultName(string $vault): void()
+    {
+
     }
 
     private function setEncryptionKey(): void
