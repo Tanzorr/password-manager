@@ -29,8 +29,6 @@ class VaultController
         while (true) {
             try {
                 $this->showVaultsMenu();
-                $this->io->writeln("====================");
-                $this->selectVault();
             } catch (DomainException $error) {
                 $this->io->writeln("====================");
                 $this->io->writeln("[ERROR]{$error->getMessage()}");
@@ -41,33 +39,24 @@ class VaultController
 
     public function showVaultsMenu(): void
     {
-       $menu = (new CliMenuBuilder())
-                ->setTitle("Menu actions:")
-                ->addItem("Select vault", fn() => $this->selectVault())
-                ->addItem("Add vault", fn() => $this->addVault())
-                ->addItem("Delete vault", fn() => $this->deleteVault())
-                ->build();
-
-            $menu->open();
-
-    }
-
-    /**
-     * @throws InvalidTerminalException
-     */
-    public function selectVault(): void
-    {
         $vaults = array_diff(Vault::findAll(), ['.', '..']);
         if(count($vaults) === 0){
             throw new DomainException("No vaults found");
         }
-        $menuBuilder = (new CliMenuBuilder())->setTitle('Select vaults:');
+
+        $menuBuilder = (new CliMenuBuilder())->setTitle('Menu actions:');
+
+        $menuBuilder->addItem("Add vault", fn() => $this->addVault());
+        $menuBuilder->addItem("Quit", function (){} );
+        $menuBuilder->addItem("========", function (){});
+        $menuBuilder->addItem("Select vaults:", function (){});
 
         array_walk($vaults, function ($vault) use ($menuBuilder) {
             $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault, $menu));
         });
 
         $menuBuilder->build()->open();
+
     }
 
     /**
@@ -80,32 +69,22 @@ class VaultController
         $this->setEncryptionKey();
         $this->editVaultName($vault);
 
-        $menu = (new CliMenuBuilder())
-            ->addItem("edit Vault", fn() => $this->editVaultName($vault))
-            ->addItem("add password", fn() => $this->passwordManager->addPassword())
-          //  ->addItem("password list", fn() => $this->displayAllPasswords())
-            ->build();
-
-        $menu->open();
-
-        $menu->close();
-    }
-
-    private function displayAllPasswords()
-    {
         $passwords = $this->passwordManager->getAllPasswords();
-        var_dump($passwords);
-        exit();
 
-        if(count($passwords) === 0){
-            throw new DomainException("No passwords found");
+        if (count($passwords) === 0) {
+            $this->io->writeln("<< No passwords found >>");
         }
 
-        $menuBuilder = (new CliMenuBuilder())->setTitle('Passwords:');
+        $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions:');
 
-//        array_walk($passwords, function ($password) use ($menuBuilder) {
-//            $menuBuilder->addItem($password, fn(CliMenu $menu) =>  $this->io->write($password));
-//        });
+        $menuBuilder->addItem("edit Vault", fn() => $this->editVaultName($vault));
+        $menuBuilder->addItem("add password", fn() => $this->passwordManager->addPassword());
+        $menuBuilder->addItem("========", function (){});
+        $menuBuilder->addItem("Select password", function (){});
+
+        array_walk($passwords, function ($password) use ($menuBuilder) {
+            $menuBuilder->addItem($password->name, function (){});
+        });
 
         $menuBuilder->build()->open();
     }
