@@ -66,6 +66,23 @@ class PasswordController
         $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
     }
 
+    public function displayPassword(Password $password, String $vault)
+    {
+        $this->io->writeln("Password:".$password->name. "In Vault:".$vault);
+
+        $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions:');
+
+        $menuBuilder->addItem("Password:".$password->name. " In Vault:".$vault, function (){});
+        $menuBuilder->addItem("********", function (){});
+
+        $menuBuilder->addItem("========", function (){});
+        $menuBuilder->addItem("Show password", $this->showPassword(...));
+        $menuBuilder->addItem("Edit password", $this->changePassword(...));
+        $menuBuilder->addItem("Delete password", $this->deletePassword(...));
+
+        $menuBuilder->build()->open();
+    }
+
 
     public function askForPasswordValue(): string
     {

@@ -82,8 +82,8 @@ class VaultController
         $menuBuilder->addItem("========", function (){});
         $menuBuilder->addItem("Select password", function (){});
 
-        array_walk($passwords, function ($password) use ($menuBuilder) {
-            $menuBuilder->addItem($password->name, function (){});
+        array_walk($passwords, function ($password) use ($menuBuilder, $vault) {
+            $menuBuilder->addItem($password->name, fn() => $this->passwordManager->displayPassword($password, $vault));
         });
 
         $menuBuilder->build()->open();
