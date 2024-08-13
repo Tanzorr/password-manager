@@ -73,6 +73,18 @@ class VaultRepository implements RepositoryInterface
         return true;
     }
 
+
+    public function updateVaultName(String $vaultName, String $newName): bool
+    {
+        $oldName = $this->vaultsStoragePath . $vaultName . '.json';
+        $newName = $this->vaultsStoragePath . $newName . '.json';
+
+       if(rename($oldName, $newName)) {
+           return true;
+       }
+       return false;
+    }
+
     /**
      * @throws \Exception
      */

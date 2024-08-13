@@ -66,7 +66,7 @@ class PasswordController
         $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
     }
 
-    public function displayPassword(Password $password, String $vault)
+    public function displayPassword(Password $password, String $vault, VaultController $vaultController)
     {
         $this->io->writeln("Password:".$password->name. "In Vault:".$vault);
 
@@ -79,6 +79,7 @@ class PasswordController
         $menuBuilder->addItem("Show password", $this->showPassword(...));
         $menuBuilder->addItem("Edit password", $this->changePassword(...));
         $menuBuilder->addItem("Delete password", $this->deletePassword(...));
+        $menuBuilder->addItem("back", fn()=> $vaultController->selectVaultItem($vault));
 
         $menuBuilder->build()->open();
     }

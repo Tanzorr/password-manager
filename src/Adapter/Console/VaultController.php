@@ -52,23 +52,26 @@ class VaultController
         $menuBuilder->addItem("Select vaults:", function (){});
 
         array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault, $menu));
+            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault));
         });
 
         $menuBuilder->build()->open();
-
     }
 
     /**
      * @throws InvalidTerminalException
      */
-    private function selectVaultItem(string $vault, CliMenu $menu): void
+    public function selectVaultItem(string $vault): void
     {
         $this->io->writeln("Selected vault: $vault");
         $this->setVaultConfig($vault);
-        $this->setEncryptionKey();
-        $this->editVaultName($vault);
+        $vaultEncryptorKey = $this->config->get("encryptionKey");
 
+        if(!$vaultEncryptorKey){
+            $this->setEncryptionKey();
+        }
+
+        $this->editVaultName($vault);
         $passwords = $this->passwordManager->getAllPasswords();
 
         if (count($passwords) === 0) {
@@ -83,9 +86,10 @@ class VaultController
         $menuBuilder->addItem("Select password", function (){});
 
         array_walk($passwords, function ($password) use ($menuBuilder, $vault) {
-            $menuBuilder->addItem($password->name, fn() => $this->passwordManager->displayPassword($password, $vault));
+            $menuBuilder->addItem($password->name, fn() => $this->passwordManager->displayPassword($password, $vault, $this));
         });
 
+        $menuBuilder->addItem("Back", fn()=>$this->showVaultsMenu());
         $menuBuilder->build()->open();
     }
 
@@ -98,13 +102,6 @@ class VaultController
     private function editVaultName(string $vault): void
     {
         $this->io->writeln("Edit vault: $vault");
-    }
-
-    /**
-     * @throws \Exception
-     */
-    private function addPassword():void{
-        $this->passwordManager->addPassword();
     }
 
     private function setEncryptionKey(): void
