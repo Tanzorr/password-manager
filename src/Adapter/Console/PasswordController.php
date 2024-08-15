@@ -6,11 +6,9 @@ use App\AskHelper;
 use App\Core\Console\InputOutput;
 use App\Domain\Model\Password;
 use App\Domain\Model\Vault;
-use App\NoReturn;
 use Exception;
 use Illuminate\Contracts\Config\Repository;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
-use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class PasswordController
 {
@@ -20,24 +18,6 @@ class PasswordController
         private Repository  $config
     )
     {
-    }
-
-    /**
-     * @throws InvalidTerminalException
-     */
-    public function showMenu(): void
-    {
-        $menu = (new CliMenuBuilder())
-            ->setTitle("Menu actions:")
-            ->addItem("Show password", $this->showPassword(...))
-            ->addItem("Add password", $this->addPassword(...))
-            ->addItem("Delete password", $this->deletePassword(...))
-            ->addItem("Change password", $this->changePassword(...))
-            ->addItem("List all passwords names", $this->showAllPasswords(...))
-            ->addItem("logout", $this->logout(...))
-            ->build();
-
-        $menu->open();
     }
 
     /**
@@ -87,18 +67,6 @@ class PasswordController
         $menuBuilder->build()->open();
     }
 
-
-    public function askForPasswordValue(): string
-    {
-        return $this->io->expect("Enter password value:");
-    }
-
-
-    public function askForPasswordName(): string
-    {
-        return $this->io->expect("Enter password name:");
-    }
-
     /**
      * @throws Exception
      */
@@ -134,29 +102,5 @@ class PasswordController
     public function getAllPasswords(): array
     {
         return Password::findAll();
-    }
-
-    /**
-     * @throws Exception
-     */
-    public function showAllPasswords(): void
-    {
-        $passwords = Password::findAll();
-        $this->io->writeln("===============");
-
-        if (count($passwords) === 0) {
-            $this->io->writeln("<< No passwords found >>");
-        }
-
-        foreach ($passwords as $password) {
-            $this->io->writeln("Password name: " . $password->name);
-        }
-
-        $this->io->writeln("===============");
-    }
-
-    #[NoReturn] private function logout(): void
-    {
-        exit();
     }
 }

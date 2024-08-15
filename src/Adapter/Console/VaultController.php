@@ -133,6 +133,8 @@ class VaultController
         ]);
 
         $this->io->writeln("Vault $vaultName created successfully");
+        $this->showVaultsMenu();
+
     }
 
     public function deleteVault(): void
