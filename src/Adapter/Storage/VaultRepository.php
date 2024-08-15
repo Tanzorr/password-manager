@@ -56,14 +56,14 @@ class VaultRepository implements RepositoryInterface
      */
     public function update(array $attributes): bool
     {
-        if (!$this->isVaultExist($attributes['name'].'.json')&& !$this->isVaultExist($attributes['name'])) {
+        if (!$this->isVaultExist($attributes['name'] . '.json') && !$this->isVaultExist($attributes['name'])) {
             throw new \Exception('Vault does not exist');
         }
 
         $vaultsData = json_decode($this->filesystem->get($this->vaultLogsPath), true);
 
         foreach ($vaultsData as &$vault) {
-            if ($vault['name'].'.json' === $attributes['name']) {
+            if ($vault['name'] . '.json' === $attributes['name']) {
                 $vault['updated_at'] = $attributes['updated_at'];
             }
         }
@@ -74,15 +74,15 @@ class VaultRepository implements RepositoryInterface
     }
 
 
-    public function updateVaultName(String $vaultName, String $newName): bool
+    public function updateVaultName(string $vaultName, string $newName): bool
     {
-        $oldName = $this->vaultsStoragePath . $vaultName . '.json';
+        $oldName = $this->vaultsStoragePath . $vaultName;
         $newName = $this->vaultsStoragePath . $newName . '.json';
 
-       if(rename($oldName, $newName)) {
-           return true;
-       }
-       return false;
+        if (rename($oldName, $newName)) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -90,8 +90,8 @@ class VaultRepository implements RepositoryInterface
      */
     public function delete(int|string $id): bool
     {
-        if (!$this->isVaultExist($id.'.json')) {
-           throw new \Exception('Vault does not exist');
+        if (!$this->isVaultExist($id . '.json')) {
+            throw new \Exception('Vault does not exist');
         }
 
         $this->filesystem->delete($this->vaultsStoragePath . $id . '.json');
@@ -112,11 +112,11 @@ class VaultRepository implements RepositoryInterface
      */
     public function find(int|string $id): ?object
     {
-        if (!$this->isVaultExist($id.'.json')) {
+        if (!$this->isVaultExist($id . '.json')) {
             throw new \Exception('Vault does not exist');
         }
 
-       return $this->filesystem->get($this->vaultsStoragePath . $id);
+        return $this->filesystem->get($this->vaultsStoragePath . $id);
     }
 
     public function findAll(): array

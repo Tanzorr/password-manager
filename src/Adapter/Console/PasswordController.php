@@ -43,7 +43,7 @@ class PasswordController
     /**
      * @throws Exception
      */
-    public function addPassword(): void
+    public function addPassword(VaultController $vaultController, string $vault): void
     {
         Password::create([
             'name' => $this->askHelper->askPasswordName(),
@@ -55,31 +55,34 @@ class PasswordController
             'updated_at' => date('Y-m-d H:i:s')
         ]);
 
-        $this->showMenu();
+        $vaultController->selectVaultItem($vault);
     }
 
     /**
      * @throws Exception
      */
-    private function showPassword(): void
+    private function showPassword($passwordName): void
     {
-        $this->io->writeln(Password::find($this->askHelper->askPasswordName())->value);
+        $this->io->writeln(Password::find($passwordName)->value);
     }
 
-    public function displayPassword(Password $password, String $vault, VaultController $vaultController)
+    public function displayPassword(Password $password, string $vault, VaultController $vaultController)
     {
-        $this->io->writeln("Password:".$password->name. "In Vault:".$vault);
+        $this->io->writeln("Password:" . $password->name . "In Vault:" . $vault);
 
         $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions:');
 
-        $menuBuilder->addItem("Password:".$password->name. " In Vault:".$vault, function (){});
-        $menuBuilder->addItem("********", function (){});
+        $menuBuilder->addItem("Password:" . $password->name . " In Vault:" . $vault, function () {
+        });
+        $menuBuilder->addItem("********", function () {
+        });
 
-        $menuBuilder->addItem("========", function (){});
-        $menuBuilder->addItem("Show password", $this->showPassword(...));
-        $menuBuilder->addItem("Edit password", $this->changePassword(...));
-        $menuBuilder->addItem("Delete password", $this->deletePassword(...));
-        $menuBuilder->addItem("back", fn()=> $vaultController->selectVaultItem($vault));
+        $menuBuilder->addItem("========", function () {
+        });
+        $menuBuilder->addItem("Show password", fn() => $this->showPassword($password->name));
+        $menuBuilder->addItem("Edit password", fn() => $this->changePassword($password->name));
+        $menuBuilder->addItem("Delete password", fn() => $this->deletePassword($password->name, $vault, $vaultController));
+        $menuBuilder->addItem("back", fn() => $vaultController->selectVaultItem($vault));
 
         $menuBuilder->build()->open();
     }
@@ -99,25 +102,26 @@ class PasswordController
     /**
      * @throws Exception
      */
-    private function deletePassword(): void
+    private function deletePassword(String $passwordName, string $vaultName, VaultController $vaultController): void
     {
-        if (Password::delete($passwordName = $this->askHelper->askPasswordName())) {
+        if (Password::delete($passwordName)) {
             $this->io->writeln("$passwordName Password deleted.");
             Vault::update([
                 'name' => $this->config->get('activeVault'),
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
         }
-        $this->showMenu();
+
+        $vaultController->selectVaultItem($vaultName);
     }
 
     /**
      * @throws Exception
      */
-    private function changePassword(): void
+    private function changePassword(String $passwordName): void
     {
         Password::update([
-            'name' => $this->askHelper->askPasswordName(),
+            'name' => $passwordName,
             'value' => $this->askHelper->askPasswordValue()
         ]);
 
@@ -125,13 +129,11 @@ class PasswordController
             'name' => $this->config->get('activeVault'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-
-        $this->showMenu();
     }
 
-    public function getAllPasswords():array
+    public function getAllPasswords(): array
     {
-      return  Password::findAll();
+        return Password::findAll();
     }
 
     /**
