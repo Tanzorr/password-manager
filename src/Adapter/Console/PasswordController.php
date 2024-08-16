@@ -25,6 +25,7 @@ class PasswordController
      */
     public function addPassword(VaultController $vaultController, string $vault): void
     {
+
         Password::create([
             'name' => $this->askHelper->askPasswordName(),
             'value' => $this->askHelper->askPasswordValue()
