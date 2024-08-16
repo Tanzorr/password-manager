@@ -90,11 +90,11 @@ class VaultRepository implements RepositoryInterface
      */
     public function delete(int|string $id): bool
     {
-        if (!$this->isVaultExist($id . '.json')) {
+        if (!$this->isVaultExist($id)) {
             throw new \Exception('Vault does not exist');
         }
 
-        $this->filesystem->delete($this->vaultsStoragePath . $id . '.json');
+        $this->filesystem->delete($this->vaultsStoragePath . $id);
         $vaultLogsContent = $this->filesystem->get($this->vaultLogsPath);
         $vaultsData = json_decode($vaultLogsContent, true);
 
@@ -112,8 +112,8 @@ class VaultRepository implements RepositoryInterface
      */
     public function find(int|string $id): ?object
     {
-        if (!$this->isVaultExist($id . '.json')) {
-            throw new \Exception('Vault does not exist');
+        if (!$this->isVaultExist($id)) {
+            throw new \Exception("Vault $id does not exist");
         }
 
         return $this->filesystem->get($this->vaultsStoragePath . $id);

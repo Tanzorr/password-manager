@@ -96,6 +96,7 @@ class VaultController
         });
 
         $menuBuilder->addItem("Back", fn() => $this->showVaultsMenu());
+        $menuBuilder->addItem("Delete vault", fn()=> $this->deleteVault($vault));
         $menuBuilder->build()->open();
     }
 
@@ -137,12 +138,14 @@ class VaultController
 
     }
 
-    public function deleteVault(): void
+    public function deleteVault(string $vaultName): void
     {
-        if (Vault::delete($vaultName = $this->io->expect("Enter vault name: "))) {
+        if (Vault::delete($vaultName)) {
             $this->io->writeln("Vault $vaultName deleted successfully");
         } else {
             $this->io->writeln("Vault $vaultName not found");
         }
+
+        $this->showVaultsMenu();
     }
 }
