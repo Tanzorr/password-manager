@@ -12,6 +12,7 @@ use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class VaultController
 {
+    private const VAULTS_PATH = 'vaults/';
     protected $config;
 
     public function __construct(
@@ -102,30 +103,9 @@ class VaultController
 
     private function setVaultConfig(string $vault): void
     {
-        $this->config->set('storagePath', 'vaults/' . $vault);
+        $this->config->set('storagePath', self::VAULTS_PATH . $vault);
         $this->config->set('activeVault', $vault);
     }
-
-    private function editVaultName(string $vaultName): void
-    {
-        $this->io->writeln("Edit vault: $vaultName");
-        $newVaultName = $this->io->expect("Enter new vault name for: $vaultName");
-
-         if(Vault::updateVaultName($vaultName, $newVaultName)){
-             $this->selectVaultItem($newVaultName);
-         };
-    }
-
-    private function setEncryptionKey(): void
-    {
-        $encryptionKey = $this->io->expect("Enter encryption name: ");
-        if ($encryptionKey === '') {
-            $this->io->writeln("Encryption name is empty.");
-            exit;
-        }
-        $this->config->set('encryptionKey', $encryptionKey);
-    }
-
     public function addVault(): void
     {
         Vault::create([
@@ -147,5 +127,25 @@ class VaultController
         }
 
         $this->showVaultsMenu();
+    }
+
+    private function setEncryptionKey(): void
+    {
+        $encryptionKey = $this->io->expect("Enter encryption name: ");
+        if ($encryptionKey === '') {
+            $this->io->writeln("Encryption name is empty.");
+            exit;
+        }
+        $this->config->set('encryptionKey', $encryptionKey);
+    }
+
+    private function editVaultName(string $vaultName): void
+    {
+        $this->io->writeln("Edit vault: $vaultName");
+        $newVaultName = $this->io->expect("Enter new vault name for: $vaultName");
+
+        if(Vault::updateVaultName($vaultName, $newVaultName)){
+            $this->selectVaultItem($newVaultName);
+        };
     }
 }

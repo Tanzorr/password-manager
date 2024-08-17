@@ -26,7 +26,6 @@ class PasswordController
     public function addPassword(VaultController $vaultController, string $vault): void
     {
         $passwordName = $this->askHelper->askPasswordName();
-        echo "Password Name: " . $passwordName . PHP_EOL;
 
         Password::create([
             'name' => $passwordName,
@@ -71,6 +70,11 @@ class PasswordController
         $menuBuilder->build()->open();
     }
 
+    public function getAllPasswords(): array
+    {
+        return Password::findAll();
+    }
+
     /**
      * @throws Exception
      */
@@ -101,10 +105,5 @@ class PasswordController
             'name' => $this->config->get('activeVault'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-    }
-
-    public function getAllPasswords(): array
-    {
-        return Password::findAll();
     }
 }
