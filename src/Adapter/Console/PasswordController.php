@@ -25,9 +25,11 @@ class PasswordController
      */
     public function addPassword(VaultController $vaultController, string $vault): void
     {
+        $passwordName = $this->askHelper->askPasswordName();
+        echo "Password Name: " . $passwordName . PHP_EOL;
 
         Password::create([
-            'name' => $this->askHelper->askPasswordName(),
+            'name' => $passwordName,
             'value' => $this->askHelper->askPasswordValue()
         ]);
 
@@ -38,6 +40,7 @@ class PasswordController
 
         $vaultController->selectVaultItem($vault);
     }
+
 
     /**
      * @throws Exception

@@ -12,8 +12,23 @@ class AskHelper
 
     public function askPasswordName(): string
     {
-        return $this->askField('password name');
+        $passwordName = '';
+        echo "Enter password name: ";
+
+        while (true) {
+            $char = fgetc(STDIN);
+
+            if ($char === PHP_EOL) {
+                break;
+            }
+
+            echo $char;
+            $passwordName .= $char;
+        }
+
+        return trim($passwordName);
     }
+
 
     public function askPasswordValue(): string
     {
