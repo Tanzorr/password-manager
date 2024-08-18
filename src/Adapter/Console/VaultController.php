@@ -19,8 +19,7 @@ class VaultController
         Repository                 $config,
         private PasswordController $passwordManager,
         private InputOutput        $io,
-    )
-    {
+    ) {
         $this->config = $config;
     }
 
@@ -49,16 +48,17 @@ class VaultController
 
         $menuBuilder = (new CliMenuBuilder())->setTitle('Menu actions:');
 
-        $menuBuilder->addItem("Add vault", fn() => $this->addVault());
+        $menuBuilder->addItem("Add vault", fn () => $this->addVault());
         $menuBuilder->addItem("Quit", function () {
+            $this->io->write('Bye.');
+            exit;
         });
-        $menuBuilder->addItem("========", function () {
-        });
-        $menuBuilder->addItem("Select vaults:", function () {
-        });
+        $menuBuilder->addLineBreak(" ");
+        $menuBuilder->addStaticItem("List of vaults:");
+        $menuBuilder->addLineBreak("=");
 
         array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addItem($vault, fn(CliMenu $menu) => $this->selectVaultItem($vault));
+            $menuBuilder->addItem($vault, fn (CliMenu $menu) => $this->selectVaultItem($vault));
         });
 
         $menuBuilder->build()->open();
@@ -84,20 +84,33 @@ class VaultController
         }
 
         $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions: in '.$vault);
+        /**/
+        /*$menuBuilder->addSubMenu("Actions", function ($submenuBuilder) use($vault) {*/
+        /*    $submenuBuilder->addItem("edit Vault", fn () => $this->editVaultName($vault));*/
+        /*    $submenuBuilder->addItem("add password", fn () => $this->passwordManager->addPassword($this, $vault));*/
+        /*    $submenuBuilder->addItem("Back", fn () => $this->showVaultsMenu());*/
+        /*    $submenuBuilder->addItem("Delete vault", fn () => $this->deleteVault($vault));*/
+        /*});*/
+        /**/
+        /*$menuBuilder->addSubMenu("Password", function ($subMenuBuilder) use ($vault, $passwords) {*/
+        /*    array_walk($passwords, function ($password) use ($subMenuBuilder, $vault) {*/
+        /*        $subMenuBuilder->addItem($password->name, fn () => $this->passwordManager->displayPassword($password, $vault, $this));*/
+        /*    });*/
+        /**/
+        /**/
+        /*});*/
+        $menuBuilder->addItem("Add password", fn () => $this->passwordManager->addPassword($this, $vault));
+        $menuBuilder->addItem("Edit Vault", fn () => $this->editVaultName($vault));
+        $menuBuilder->addItem("Delete vault", fn () => $this->deleteVault($vault));
+        $menuBuilder->addItem("Back", fn () => $this->showVaultsMenu());
+        $menuBuilder->addLineBreak(" ");
+        $menuBuilder->addStaticItem("List of password for $vault:");
+        $menuBuilder->addLineBreak("=");
 
-        $menuBuilder->addItem("edit Vault", fn() => $this->editVaultName($vault));
-        $menuBuilder->addItem("add password", fn() => $this->passwordManager->addPassword($this, $vault));
-        $menuBuilder->addItem("========", function () {
-        });
-        $menuBuilder->addItem("Select password", function () {
+        array_walk($passwords, function ($password) use ($vault, $menuBuilder) {
+            $menuBuilder->addItem($password->name, fn () => $this->passwordManager->displayPassword($password, $vault, $this));
         });
 
-        array_walk($passwords, function ($password) use ($menuBuilder, $vault) {
-            $menuBuilder->addItem($password->name, fn() => $this->passwordManager->displayPassword($password, $vault, $this));
-        });
-
-        $menuBuilder->addItem("Back", fn() => $this->showVaultsMenu());
-        $menuBuilder->addItem("Delete vault", fn()=> $this->deleteVault($vault));
         $menuBuilder->build()->open();
     }
 
@@ -144,8 +157,9 @@ class VaultController
         $this->io->writeln("Edit vault: $vaultName");
         $newVaultName = $this->io->expect("Enter new vault name for: $vaultName");
 
-        if(Vault::updateVaultName($vaultName, $newVaultName)){
+        if(Vault::updateVaultName($vaultName, $newVaultName)) {
             $this->selectVaultItem($newVaultName);
         };
     }
 }
+
