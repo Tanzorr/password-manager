@@ -20,7 +20,6 @@ class VaultRepository implements RepositoryInterface
     {
         $this->vaultsStoragePath = $this->config->get('vaultsStoragePath');
         $this->vaultLogsPath = $this->config->get('vaultsLogs');
-
     }
 
 

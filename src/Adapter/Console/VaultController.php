@@ -2,43 +2,22 @@
 
 namespace App\Adapter\Console;
 
-use App\Core\Console\InputOutput;
 use App\Domain\Model\Vault;
 use DomainException;
 use Illuminate\Contracts\Config\Repository;
-use PhpSchool\CliMenu\Builder\CliMenuBuilder;
-use PhpSchool\CliMenu\CliMenu;
 use PhpSchool\CliMenu\Exception\InvalidTerminalException;
 
 class VaultController
 {
     private const VAULTS_PATH = 'vaults/';
-    protected $config;
+    public $config;
 
     public function __construct(
         Repository                 $config,
-        private PasswordController $passwordManager,
-        private InputOutput        $io,
     ) {
         $this->config = $config;
     }
-
-    public function run(): void
-    {
-        $this->io->writeln("Welcome to Password Manager");
-
-        while (true) {
-            try {
-                $this->showVaultsMenu();
-            } catch (DomainException $error) {
-                $this->io->writeln("====================");
-                $this->io->writeln("[ERROR]{$error->getMessage()}");
-                $this->io->writeln("====================");
-            }
-        }
-    }
-
-    public function showVaultsMenu(): void
+    public function gatAllVaults(): array
     {
         $this->config->set('encryptionKey', '');
         $vaults = array_diff(Vault::findAll(), ['.', '..']);
@@ -46,120 +25,41 @@ class VaultController
             throw new DomainException("No vaults found");
         }
 
-        $menuBuilder = (new CliMenuBuilder())->setTitle('Menu actions:');
-
-        $menuBuilder->addItem("Add vault", fn () => $this->addVault());
-        $menuBuilder->addItem("Quit", function () {
-            $this->io->write('Bye.');
-            exit;
-        });
-        $menuBuilder->addLineBreak(" ");
-        $menuBuilder->addStaticItem("List of vaults:");
-        $menuBuilder->addLineBreak("=");
-
-        array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addItem($vault, fn (CliMenu $menu) => $this->selectVaultItem($vault));
-        });
-
-        $menuBuilder->build()->open();
+        return $vaults;
     }
 
     /**
      * @throws InvalidTerminalException
-     */
-    public function selectVaultItem(string $vault): void
-    {
-        $this->io->writeln("Selected vault: $vault");
-        $this->setVaultConfig($vault);
-        $vaultEncryptorKey = $this->config->get("encryptionKey");
+     * */
 
-        if (!$vaultEncryptorKey) {
-            $this->setEncryptionKey();
-        }
-
-        $passwords = $this->passwordManager->getAllPasswords();
-
-        if (count($passwords) === 0) {
-            $this->io->writeln("<< No passwords found >>");
-        }
-
-        $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions: in '.$vault);
-        /**/
-        /*$menuBuilder->addSubMenu("Actions", function ($submenuBuilder) use($vault) {*/
-        /*    $submenuBuilder->addItem("edit Vault", fn () => $this->editVaultName($vault));*/
-        /*    $submenuBuilder->addItem("add password", fn () => $this->passwordManager->addPassword($this, $vault));*/
-        /*    $submenuBuilder->addItem("Back", fn () => $this->showVaultsMenu());*/
-        /*    $submenuBuilder->addItem("Delete vault", fn () => $this->deleteVault($vault));*/
-        /*});*/
-        /**/
-        /*$menuBuilder->addSubMenu("Password", function ($subMenuBuilder) use ($vault, $passwords) {*/
-        /*    array_walk($passwords, function ($password) use ($subMenuBuilder, $vault) {*/
-        /*        $subMenuBuilder->addItem($password->name, fn () => $this->passwordManager->displayPassword($password, $vault, $this));*/
-        /*    });*/
-        /**/
-        /**/
-        /*});*/
-        $menuBuilder->addItem("Add password", fn () => $this->passwordManager->addPassword($this, $vault));
-        $menuBuilder->addItem("Edit Vault", fn () => $this->editVaultName($vault));
-        $menuBuilder->addItem("Delete vault", fn () => $this->deleteVault($vault));
-        $menuBuilder->addItem("Back", fn () => $this->showVaultsMenu());
-        $menuBuilder->addLineBreak(" ");
-        $menuBuilder->addStaticItem("List of password for $vault:");
-        $menuBuilder->addLineBreak("=");
-
-        array_walk($passwords, function ($password) use ($vault, $menuBuilder) {
-            $menuBuilder->addItem($password->name, fn () => $this->passwordManager->displayPassword($password, $vault, $this));
-        });
-
-        $menuBuilder->build()->open();
-    }
-
-    private function setVaultConfig(string $vault): void
+    public function setVaultConfig(string $vault): void
     {
         $this->config->set('storagePath', self::VAULTS_PATH . $vault);
         $this->config->set('activeVault', $vault);
     }
-    public function addVault(): void
+    public function addVault($vaultName): bool
     {
         Vault::create([
-            'name' => $vaultName = $this->io->expect("Enter vault name: "),
+            'name' => $vaultName,
             'created_at' => date('Y-m-d H:i:s')
         ]);
 
-        $this->io->writeln("Vault $vaultName created successfully");
-        $this->showVaultsMenu();
-
+        return true;
     }
 
-    public function deleteVault(string $vaultName): void
+    public function deleteVault(string $vaultName): bool
     {
-        if (Vault::delete($vaultName)) {
-            $this->io->writeln("Vault $vaultName deleted successfully");
-        } else {
-            $this->io->writeln("Vault $vaultName not found");
-        }
-
-        $this->showVaultsMenu();
+       return Vault::delete($vaultName);
     }
 
-    private function setEncryptionKey(): void
+    public function setEncryptionKey($encryptionKey): void
     {
-        $encryptionKey = $this->io->expect("Enter encryption name: ");
-        if ($encryptionKey === '') {
-            $this->io->writeln("Encryption name is empty.");
-            exit;
-        }
         $this->config->set('encryptionKey', $encryptionKey);
     }
 
-    private function editVaultName(string $vaultName): void
+    public function editVaultName(string $vaultName, $newVaultName): void
     {
-        $this->io->writeln("Edit vault: $vaultName");
-        $newVaultName = $this->io->expect("Enter new vault name for: $vaultName");
-
-        if(Vault::updateVaultName($vaultName, $newVaultName)) {
-            $this->selectVaultItem($newVaultName);
-        };
+        Vault::updateVaultName($vaultName, $newVaultName);
     }
 }
 

@@ -118,6 +118,7 @@ class PasswordRepository implements RepositoryInterface
         $passwords = $this->filesystemEncryptor->get($this->storagePath)
             ?: json_encode([]);
 
+
         if ($passwords === '') {
             throw new Exception('Access denied');
         }
