@@ -44,19 +44,16 @@ class View
         $menuBuilder = (new CliMenuBuilder())->setTitle('Menu actions:');
 
         $menuBuilder->addItem("Add vault", fn() => $this->addVault());
-        $menuBuilder->addItem("Quit", function () {
-            $this->io->writeln('Bye');
-        });
 
         $menuBuilder->addLineBreak("");
         $menuBuilder->addStaticItem("List of vaults");
         $menuBuilder->addLineBreak("=");
 
-
-        array_walk($vaults, function ($vault) use ($menuBuilder) {
-            $menuBuilder->addSubMenu($vault, fn() => $this->selectVault($vault));
+        $menuBuilder->addSubMenu("Vaults", function ($submenuBuilder) use ($vaults) {
+            array_walk($vaults, function ($vault) use ($submenuBuilder) {
+                $submenuBuilder->addItem($vault, fn() => $this->selectVault($vault));
+            });
         });
-
 
         $menuBuilder->build()->open();
     }
@@ -81,9 +78,9 @@ class View
             $submenuBuilder->addItem("Delete vault", fn() => $this->vaultController->deleteVault($vaultName));
         });
 
-        $menuBuilder->addSubMenu("Passwords", function ($submenuBuilder) use ($passwords, $vaultName) {
-            array_walk($passwords, function ($password) use ($submenuBuilder, $vaultName) {
-                $submenuBuilder->addSubMenu($password->name, fn() => $this->displayPassword($password, $vaultName));
+        $menuBuilder->addSubMenu("Passwords", function ($menuBuilder) use ($passwords, $vaultName) {
+            array_walk($passwords, function ($password) use ($menuBuilder, $vaultName) {
+                $menuBuilder->addSubMenu($password->name, fn() => $this->displayPassword($password, $vaultName));
             });
         });
         $menuBuilder->build()->open();
