@@ -6,8 +6,9 @@ use App\AskHelper;
 use App\Core\Console\InputOutput;
 use App\Domain\Model\Password;
 use DomainException;
+use PhpSchool\CliMenu\Action\ExitAction;
+use PhpSchool\CliMenu\Action\GoBackAction;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
-use PhpSchool\CliMenu\CliMenu;
 
 class View
 {
@@ -75,7 +76,7 @@ class View
         $menuBuilder->addSubMenu("Actions", function ($submenuBuilder) use ($vaultName) {
             $submenuBuilder->addItem("edit Vault", fn() => $this->editVaultName($vaultName));
             $submenuBuilder->addItem("add password", fn() => $this->addPassword($vaultName));
-            $submenuBuilder->addItem("Delete vault", fn() => $this->vaultController->deleteVault($vaultName));
+            $submenuBuilder->addItem("Delete vault", fn() => $this->deleteVault($vaultName));
         });
 
         $menuBuilder->addSubMenu("Passwords", function ($menuBuilder) use ($passwords, $vaultName) {
@@ -126,13 +127,10 @@ class View
 
         $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions:');
 
-        $menuBuilder->addItem("Password:" . $password->name . " In Vault:" . $vault, function () {
-        });
-        $menuBuilder->addItem("********", function () {
-        });
+        $menuBuilder->addStaticItem("Password:" . $password->name . " In Vault:" . $vault);
+        $menuBuilder->addStaticItem("********");
 
-        $menuBuilder->addItem("========", function () {
-        });
+        $menuBuilder->addLineBreak("========");
         $menuBuilder->addItem("Show password", fn() => $this->showPassword($password->name));
         $menuBuilder->addItem("Edit password", fn() => $this->changePassword($password->name));
         $menuBuilder->addItem("Delete password", fn() => $this->deletePassword($password->name));
