@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Core\Console\InputOutput;
+
 class AskHelper
 {
     public function __construct(private InputOutput $io)
@@ -10,8 +12,23 @@ class AskHelper
 
     public function askPasswordName(): string
     {
-        return $this->askField('password name');
+        $passwordName = '';
+        echo "Enter password name: ";
+
+        while (true) {
+            $char = fgetc(STDIN);
+
+            if ($char === PHP_EOL) {
+                break;
+            }
+
+            echo $char;
+            $passwordName .= $char;
+        }
+
+        return trim($passwordName);
     }
+
 
     public function askPasswordValue(): string
     {
@@ -25,7 +42,7 @@ class AskHelper
 
     private function askField(string $fieldName): string
     {
-        $fieldVal = $this->io->expect("Enter $fieldName: ");
+        $fieldVal = $this->io->askText("Enter $fieldName: ");
 
         return $fieldVal ?: $this->retryField($fieldName);
     }
@@ -35,5 +52,10 @@ class AskHelper
         $this->io->writeln("Field $fieldName is empty.");
 
         return $this->askField($fieldName);
+    }
+
+    public function displayText($input, bool $required = false): string
+    {
+        return $this->io->askText($input, $required);
     }
 }

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repository;
+namespace App\Adapter\Storage;
 
 
-use App\FilesystemEncryptor;
-use App\Model\Password;
+use App\Core\Filesystem\FilesystemEncryptor;
+use App\Core\Storage\Repository\RepositoryInterface;
+use App\Domain\Model\Password;
 use Exception;
 use Illuminate\Contracts\Config\Repository;
 
@@ -116,6 +117,7 @@ class PasswordRepository implements RepositoryInterface
     {
         $passwords = $this->filesystemEncryptor->get($this->storagePath)
             ?: json_encode([]);
+
 
         if ($passwords === '') {
             throw new Exception('Access denied');
