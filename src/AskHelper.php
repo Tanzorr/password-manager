@@ -53,4 +53,9 @@ class AskHelper
 
         return $this->askField($fieldName);
     }
+
+    public function displayText($input, bool $required = false): string
+    {
+        return $this->io->expect($input, $required);
+    }
 }
