@@ -2,7 +2,9 @@
 
 namespace App\Adapter\Console;
 
+
 use App\AskHelper;
+use App\Core\Console\InputOutput;
 use App\Domain\Model\Password;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 
@@ -11,57 +13,66 @@ class PasswordView
 
     public function __construct(
         private PasswordController $passwordController,
-        private AskHelper          $askHelper
+        private InputOutput         $io,
+        private AskHelper           $askHelper
     )
     {
     }
 
+    /**
+     * @throws \Exception
+     */
     public function addPassword(string $vaultName): void
     {
         $passwordName = $this->askHelper->askPasswordName();
         $passwordValue = $this->askHelper->askPasswordValue();
 
         $this->passwordController->addPassword($passwordName, $passwordValue);
-       // $this->menuBuilder->flesh("Password $passwordName added to vault $vaultName");
-        $this->askHelper->displayText("Password $passwordName added to vault $vaultName");
+        $this->io->askText("Password $passwordName added to vault $vaultName");
     }
 
     public function displayPassword(Password $password, string $vault): void
     {
-       // $this->askHelper->displayText("Password:" . $password->name . "In Vault:" . $vault);
-
         $menuBuilder = (new CliMenuBuilder())->setTitle('Password Menu actions:');
 
         $menuBuilder->addStaticItem("Password:" . $password->name . " In Vault:" . $vault);
         $menuBuilder->addStaticItem("********");
 
         $menuBuilder->addLineBreak("========");
-        $menuBuilder->addItem("Show password", fn() => $this->showPassword($password->name));
+        $menuBuilder->addItem("Show password", fn() => $this->showPassword($password));
         $menuBuilder->addItem("Edit password", fn() => $this->changePassword($password->name));
         $menuBuilder->addItem("Delete password", fn() => $this->deletePassword($password->name));
 
         $menuBuilder->build()->open();
     }
 
-    private function showPassword($passwordName): void
+    /**
+     * @throws \Exception
+     */
+    private function showPassword(Password $password): void
     {
-        $this->askHelper->displayText("Password: $passwordName");
-        $this->askHelper->displayText($this->passwordController->showPassword($passwordName));
+        $this->io->askText("Value: $password->value");
     }
 
+    /**
+     * @throws \Exception
+     */
     private function changePassword(string $passwordName): void
     {
         $this->passwordController->changePassword($passwordName, $this->askHelper->askPasswordValue());
-        $this->askHelper->displayText("$passwordName Password updated.");
+        $this->io->askText("$passwordName Password updated.");
     }
 
+    /**
+     * @throws \Exception
+     */
     private function deletePassword(string $passwordName): void
     {
         if (!$this->passwordController->deletePassword($passwordName)) {
-            $this->askHelper->displayText("Password $passwordName not found");
+            $this->io->askText("Password $passwordName not found");
             return;
         }
-        $this->askHelper->displayText("$passwordName Password deleted.");
+        $this->io->askText("$passwordName Password deleted.");
     }
 
 }

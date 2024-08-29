@@ -5,6 +5,7 @@ namespace App\Adapter\Console;
 use App\AskHelper;
 use App\Core\Console\InputOutput;
 use DomainException;
+use PhpSchool\CliMenu\Action\GoBackAction;
 use PhpSchool\CliMenu\Builder\CliMenuBuilder;
 
 class VaultView
@@ -81,6 +82,7 @@ class VaultView
                 $menuBuilder->addItem($password->name, fn() => $this->passwordView->displayPassword($password, $vaultName));
             });
         });
+
         $menuBuilder->build()->open();
     }
 
@@ -95,7 +97,7 @@ class VaultView
     private function editVaultName(string $vaultName): void
     {
         $this->io->writeln("Edit vault: $vaultName");
-        $newVaultName = $this->io->expect("Enter new vault name for: $vaultName");
+        $newVaultName = $this->io->askText("Enter new vault name for: $vaultName");
 
         $this->vaultController->editVaultName($vaultName, $newVaultName);
     }
@@ -111,7 +113,7 @@ class VaultView
 
     private function setEncryptionKey(): void
     {
-        $encryptionKey = $this->io->expect("Enter encryption name: ");
+        $encryptionKey = $this->io->askText("Enter encryption name: ");
         $this->vaultController->setEncryptionKey($encryptionKey);
     }
 }

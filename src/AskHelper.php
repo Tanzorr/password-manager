@@ -42,7 +42,7 @@ class AskHelper
 
     private function askField(string $fieldName): string
     {
-        $fieldVal = $this->io->expect("Enter $fieldName: ");
+        $fieldVal = $this->io->askText("Enter $fieldName: ");
 
         return $fieldVal ?: $this->retryField($fieldName);
     }
@@ -56,6 +56,6 @@ class AskHelper
 
     public function displayText($input, bool $required = false): string
     {
-        return $this->io->expect($input, $required);
+        return $this->io->askText($input, $required);
     }
 }

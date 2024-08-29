@@ -13,7 +13,7 @@ class InputOutput
         echo $text;
     }
 
-    public function expect(string $text, bool $required = false): string
+    public function askText(string $text, bool $required = false): string
     {
         $this->write($text);
         $value = trim(readline());
@@ -21,7 +21,7 @@ class InputOutput
         if(!$value){
             $this->clearScreen();
             $this->writeln("Value is required");
-            $this->expect($text, $required);
+            $this->askText($text, $required);
         }
 
         return $value;
