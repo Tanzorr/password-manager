@@ -1,6 +1,4 @@
 <?php
-
-
 use App\Adapter\Console\VaultView;
 use App\Core\Console\InputOutput;
 use Illuminate\Container\Container;

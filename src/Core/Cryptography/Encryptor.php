@@ -26,12 +26,14 @@ class Encryptor
     {
         $decoded = base64_decode($encryptedString);
 
-        if ($decoded === false) {
+        if ($decoded === false || $decoded === '') {
             return false;
         }
 
-        list($encryptedString, $iv) = explode('::', $decoded, 2);
+        var_dump($decoded, $encryptedString);
 
+
+        list($encryptedString, $iv) = explode('::', $decoded, 2);
 
         $paddedIV = str_pad($iv, 16, "\0");
 

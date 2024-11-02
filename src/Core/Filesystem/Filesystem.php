@@ -28,6 +28,10 @@ class Filesystem
     }
     public function getAllFiles(string $storagePath): array
     {
+        if(!file_exists($storagePath)){
+            $this->createFile($storagePath);
+        }
+
         if(scandir($storagePath) === false){
             return [];
         }

@@ -22,7 +22,7 @@ class VaultController
         $this->config->set('encryptionKey', '');
         $vaults = array_diff(Vault::findAll(), ['.', '..']);
         if (count($vaults) === 0) {
-            throw new DomainException("No vaults found");
+            return [];
         }
 
         return $vaults;
